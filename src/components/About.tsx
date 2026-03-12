@@ -3,9 +3,9 @@ import { motion } from 'motion/react';
 import { Shield, Zap, Users, Target } from 'lucide-react';
 
 const stats = [
-  { label: 'Projets Réalisés', value: '150+' },
-  { label: 'Années d\'Expérience', value: '12+' },
-  { label: 'Experts Qualifiés', value: '45+' },
+  { label: 'Projets Réalisés', value: '50+' },
+  { label: 'D\'Expérience', value: 'Plus+' },
+  { label: 'Experts Qualifiés', value: 'Plusieurs' },
   { label: 'Clients Satisfaits', value: '100%' },
 ];
 

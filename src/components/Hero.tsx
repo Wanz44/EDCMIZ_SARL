@@ -8,9 +8,9 @@ export default function Hero() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=2070"
-          alt="Chantier de construction moderne"
-          className="w-full h-full object-cover opacity-40"
+          src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-R%20copie.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtUiBjb3BpZS5wbmciLCJpYXQiOjE3NzMzMzM3MDksImV4cCI6MjA4ODY5MzcwOX0.x0IwyoxqxIHyW9RfzHsKJbEp_VFVoY-JcYTx_TF5inU"
+          alt="EDCMIZ Background"
+          className="w-full h-full object-cover opacity-60"
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-petrol-dark via-petrol-dark/60 to-transparent" />

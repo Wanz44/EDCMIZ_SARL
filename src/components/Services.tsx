@@ -8,6 +8,7 @@ import {
   Cloud, 
   Database, 
   Network,
+  Code,
   CheckCircle2
 } from 'lucide-react';
 
@@ -53,6 +54,11 @@ const digitalServices = [
     title: "Réseaux & Sécurité",
     description: "Conception et maintenance d'infrastructures réseau robustes.",
     icon: Network
+  },
+  {
+    title: "Ingénierie Informatique",
+    description: "Développement sur mesure d'applications Web, Mobiles et Desktop performantes.",
+    icon: Code
   }
 ];
 
@@ -79,7 +85,10 @@ export default function Services() {
             {btpServices.map((service, index) => (
               <motion.div
                 key={service.title}
-                whileHover={{ y: -10 }}
+                whileHover={{ 
+                  y: -10,
+                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                }}
                 className="bg-white rounded-sm shadow-xl overflow-hidden group border-b-4 border-transparent hover:border-accent transition-all service-card-decoration relative"
               >
                 <div className="h-48 overflow-hidden relative">
@@ -117,10 +126,18 @@ export default function Services() {
               <h4 className="text-2xl font-bold text-white uppercase tracking-tight">Pôle Solutions Digitales</h4>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {digitalServices.map((service) => (
-                <div key={service.title} className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 hover:bg-white/10 transition-all rounded-sm service-card-decoration relative">
-                  <div className="w-16 h-16 bg-accent text-petrol-dark polygon-clip flex items-center justify-center mb-6">
+                <motion.div 
+                  key={service.title} 
+                  whileHover={{ 
+                    y: -8,
+                    backgroundColor: "rgba(255, 255, 255, 0.12)",
+                    borderColor: "rgba(212, 161, 62, 0.4)"
+                  }}
+                  className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 transition-all rounded-sm service-card-decoration relative cursor-default"
+                >
+                  <div className="w-16 h-16 bg-accent text-petrol-dark polygon-clip flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <service.icon size={32} />
                   </div>
                   <h5 className="text-xl font-bold text-white mb-4">{service.title}</h5>
@@ -135,7 +152,7 @@ export default function Services() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

@@ -17,7 +17,7 @@ export default function Footer() {
           <div className="space-y-6">
             <div className="flex items-center">
               <img 
-                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDCmiz_blanc.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FRENtaXpfYmxhbmMucG5nIiwiaWF0IjoxNzczMzMzMzYyLCJleHAiOjIwODg2OTMzNjJ9.-edbmzs_YuQcdnQ7H5KtzfoyPs3RGLwlTkp8AO78ers" 
                 alt="EDCMIZ Logo" 
                 className="h-32 w-auto object-contain"
                 referrerPolicy="no-referrer"
@@ -65,17 +65,12 @@ export default function Footer() {
           <div className="flex flex-col items-center lg:items-start">
             <h4 className="text-lg font-bold mb-6 uppercase tracking-widest text-accent">Scan & Connect</h4>
             <div className="bg-white p-3 rounded-lg mb-4">
-              {/* QR Code Placeholder */}
-              <div className="w-32 h-32 bg-slate-100 flex items-center justify-center relative">
-                <div className="grid grid-cols-4 gap-1">
-                  {Array.from({ length: 16 }).map((_, i) => (
-                    <div key={i} className={`w-6 h-6 ${Math.random() > 0.5 ? 'bg-petrol-dark' : 'bg-transparent'}`} />
-                  ))}
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                   <div className="w-8 h-8 bg-accent diamond-clip" />
-                </div>
-              </div>
+              <img 
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/code_barre.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9jb2RlX2JhcnJlLnBuZyIsImlhdCI6MTc3MzMzMzUzNCwiZXhwIjoyMDg4NjkzNTM0fQ.V2eG6Ip_tyHTDdLmNFt-wEw7zcVYHSEMxFmQSmLhTls" 
+                alt="QR Code EDCMIZ" 
+                className="w-32 h-32 object-contain"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest text-center lg:text-left">
               Scannez pour nos coordonnées
