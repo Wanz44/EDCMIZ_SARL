@@ -56,8 +56,16 @@ export default function News() {
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentIndex]); // Added currentIndex to dependency to ensure slide functions have latest state if needed, though they use functional updates
 
   const variants = {
     enter: (direction: number) => ({
@@ -77,30 +85,46 @@ export default function News() {
   };
 
   return (
-    <section className="py-24 bg-slate-50 overflow-hidden">
+    <section id="news" className="py-24 bg-slate-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div>
             <h2 className="text-accent font-bold uppercase tracking-widest mb-2">Actualités</h2>
             <h3 className="text-4xl font-black text-petrol-dark">Dernières Nouvelles</h3>
           </div>
-          <div className="flex items-center gap-4">
-            <button 
+        </div>
+
+        <div className="relative h-[600px] md:h-[450px] group/carousel">
+          {/* Navigation Arrows Overlay */}
+          <button 
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center text-petrol hover:bg-accent hover:text-petrol-dark transition-all opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-4 hidden md:flex"
+          >
+            <ChevronLeft size={28} />
+          </button>
+          <button 
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-20 w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center text-petrol hover:bg-accent hover:text-petrol-dark transition-all opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:-translate-x-4 hidden md:flex"
+          >
+            <ChevronRight size={28} />
+          </button>
+
+          {/* Mobile Navigation Arrows */}
+          <div className="absolute -bottom-16 left-0 right-0 flex justify-between md:hidden px-4">
+             <button 
               onClick={prevSlide}
-              className="w-12 h-12 rounded-full border-2 border-petrol/20 flex items-center justify-center text-petrol hover:bg-petrol hover:text-white transition-all"
+              className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-petrol"
             >
               <ChevronLeft size={24} />
             </button>
             <button 
               onClick={nextSlide}
-              className="w-12 h-12 rounded-full border-2 border-petrol/20 flex items-center justify-center text-petrol hover:bg-petrol hover:text-white transition-all"
+              className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-petrol"
             >
               <ChevronRight size={24} />
             </button>
           </div>
-        </div>
 
-        <div className="relative h-[500px] md:h-[450px]">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentIndex}

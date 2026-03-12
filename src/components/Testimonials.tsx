@@ -5,23 +5,18 @@ import { Quote } from 'lucide-react';
 const testimonials = [
   {
     name: "Jean-Paul Kabamba",
-    role: "Directeur Technique, SNEL",
-    text: "EDCMIZ a transformé notre approche de la maintenance des infrastructures. Leur suivi digital nous a permis de réduire les délais de 30%.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200"
+    text: "EDCMIZ a transformé notre approche de la maintenance des infrastructures. Leur rigueur technique et leur expertise nous ont permis de gagner en efficacité sur tous nos projets."
   },
   {
     name: "Marie-Claire Tshimanga",
-    role: "Promotrice Immobilière",
-    text: "Un professionnalisme rare à Kinshasa. La transparence sur les coûts et l'avancement des travaux via leur plateforme est un vrai plus.",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200"
+    text: "Un professionnalisme rare à Kinshasa. Le respect scrupuleux des budgets et la qualité des finitions sur nos chantiers font d'eux un partenaire de premier choix."
   }
 ];
 
 const partners = [
   { name: "EDC MIZ", logo: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" },
-  { name: "Gouvernement RDC", logo: "https://picsum.photos/seed/rdc/200/100" },
-  { name: "Banque Centrale", logo: "https://picsum.photos/seed/bcc/200/100" },
-  { name: "Regideso", logo: "https://picsum.photos/seed/regideso/200/100" },
+  { name: "Rawbank", logo: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/rawbank.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9yYXdiYW5rLnBuZyIsImlhdCI6MTc3MzMzNzc2NiwiZXhwIjoyMDg4Njk3NzY2fQ.6WnF8c66c9YkfUlzuHe6nsNb636OBgxoAW0UBpktS0M" },
+  { name: "Wanzcorp", logo: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/WANZCORP%20copie.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9XQU5aQ09SUCBjb3BpZS5qcGciLCJpYXQiOjE3NzMzMzc1MDEsImV4cCI6MjA4ODY5NzUwMX0.OATK_QYI28usRRHpnkoOg5FDRkAiioV1Qqw5IkRw-gM" },
 ];
 
 export default function Testimonials() {
@@ -49,15 +44,8 @@ export default function Testimonials() {
                 "{t.text}"
               </p>
               <div className="flex items-center">
-                <img 
-                  src={t.image} 
-                  alt={t.name} 
-                  className="w-12 h-12 rounded-full object-cover mr-4 border-2 border-accent"
-                  referrerPolicy="no-referrer"
-                />
                 <div>
-                  <h4 className="font-bold text-petrol-dark">{t.name}</h4>
-                  <p className="text-xs text-slate-400 uppercase tracking-wider">{t.role}</p>
+                   <h4 className="font-bold text-petrol-dark">— {t.name}</h4>
                 </div>
               </div>
             </motion.div>

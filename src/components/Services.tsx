@@ -9,7 +9,17 @@ import {
   Database, 
   Network,
   Code,
-  CheckCircle2
+  CheckCircle2,
+  Server,
+  Cpu,
+  BarChart3,
+  PieChart,
+  Search,
+  ShieldCheck,
+  Lock,
+  Globe,
+  Smartphone,
+  Monitor
 } from 'lucide-react';
 
 const btpServices = [
@@ -42,23 +52,23 @@ const btpServices = [
 const digitalServices = [
   {
     title: "Cloud & Hosting",
-    description: "Solutions d'hébergement sécurisées et évolutives pour vos entreprises.",
-    icon: Cloud
+    icon: Cloud,
+    subIcons: [Server, Cpu, Cloud]
   },
   {
     title: "Analyse de Données",
-    description: "Transformation de vos données brutes en informations stratégiques.",
-    icon: Database
+    icon: Database,
+    subIcons: [BarChart3, PieChart, Search]
   },
   {
     title: "Réseaux & Sécurité",
-    description: "Conception et maintenance d'infrastructures réseau robustes.",
-    icon: Network
+    icon: Network,
+    subIcons: [ShieldCheck, Lock, Globe]
   },
   {
     title: "Ingénierie Informatique",
-    description: "Développement sur mesure d'applications Web, Mobiles et Desktop performantes.",
-    icon: Code
+    icon: Code,
+    subIcons: [Monitor, Smartphone, Code]
   }
 ];
 
@@ -135,15 +145,23 @@ export default function Services() {
                     backgroundColor: "rgba(255, 255, 255, 0.12)",
                     borderColor: "rgba(212, 161, 62, 0.4)"
                   }}
-                  className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 transition-all rounded-sm service-card-decoration relative cursor-default"
+                  className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 transition-all rounded-sm service-card-decoration relative cursor-default group"
                 >
-                  <div className="w-16 h-16 bg-accent text-petrol-dark polygon-clip flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <service.icon size={32} />
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-14 h-14 bg-accent text-petrol-dark polygon-clip flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <service.icon size={28} />
+                    </div>
+                    <h5 className="text-xl font-bold text-white leading-tight">{service.title}</h5>
                   </div>
-                  <h5 className="text-xl font-bold text-white mb-4">{service.title}</h5>
-                  <p className="text-white/70 text-sm leading-relaxed mb-6">
-                    {service.description}
-                  </p>
+                  
+                  <div className="flex gap-4 mb-8">
+                    {service.subIcons.map((SubIcon, idx) => (
+                      <div key={idx} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-accent/80 hover:bg-accent hover:text-petrol-dark transition-colors">
+                        <SubIcon size={20} />
+                      </div>
+                    ))}
+                  </div>
+
                   <ul className="space-y-2">
                     {['Performance', 'Sécurité', 'Innovation'].map((item) => (
                       <li key={item} className="flex items-center text-xs text-accent/80">

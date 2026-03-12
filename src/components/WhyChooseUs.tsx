@@ -1,27 +1,22 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Cpu, BarChart3, Cloud, Construction, Zap, ShieldCheck } from 'lucide-react';
+import { BarChart3, Clock, Award, ShieldCheck } from 'lucide-react';
 
 const reasons = [
   {
-    icon: Cloud,
-    title: "Suivi Cloud & Reporting",
-    description: "Accédez à un tableau de bord en temps réel pour suivre l'avancement de vos travaux, les rapports journaliers et la consommation des ressources via notre plateforme cloud sécurisée."
+    icon: Clock,
+    title: "Respect des Délais",
+    description: "La ponctualité est au cœur de notre engagement. Nous mettons en œuvre une planification rigoureuse pour garantir la livraison de vos projets dans les temps convenus."
+  },
+  {
+    icon: Award,
+    title: "Expertise Technique Certifiée",
+    description: "Nos équipes sont composées d'ingénieurs et de techniciens hautement qualifiés, assurant des constructions robustes conformes aux normes internationales."
   },
   {
     icon: BarChart3,
-    title: "Analyse Prédictive des Coûts",
-    description: "Grâce à l'analyse de données historiques, nous optimisons l'approvisionnement en matériaux, réduisant les gaspillages de 15% et garantissant le respect strict de votre budget."
-  },
-  {
-    icon: Cpu,
-    title: "Ingénierie Assistée par IA",
-    description: "Nous utilisons des algorithmes d'optimisation pour concevoir des structures plus résistantes avec moins de matériaux, alliant durabilité écologique et économie financière."
-  },
-  {
-    icon: ShieldCheck,
-    title: "Sécurité & Transparence",
-    description: "La traçabilité numérique de chaque étape du chantier garantit une transparence totale et une conformité rigoureuse aux normes de sécurité internationales."
+    title: "Optimisation des Budgets",
+    description: "Nous maximisons l'efficacité de vos investissements en optimisant l'utilisation des matériaux et des ressources pour un rapport qualité-prix inégalé."
   }
 ];
 
@@ -39,9 +34,9 @@ export default function WhyChooseUs() {
             viewport={{ once: true }}
           >
             <h2 className="text-accent font-bold uppercase tracking-widest mb-2">Pourquoi nous choisir ?</h2>
-            <h3 className="text-4xl font-black text-petrol-dark mb-6">La Synergie Unique <br /><span className="text-petrol">BTP + Digital</span></h3>
+            <h3 className="text-4xl font-black text-petrol-dark mb-6">Une Expertise Reconnue <br /><span className="text-petrol">dans le BTP & l'Ingénierie</span></h3>
             <p className="text-slate-600 text-lg mb-8 leading-relaxed">
-              EDCMIZ sarl n'est pas une entreprise de construction ordinaire. Nous sommes des pionniers de l'ingénierie moderne en RDC, fusionnant l'expertise du bâtiment avec la puissance du numérique.
+              EDCMIZ sarl est une entreprise de construction de référence en RDC. Nous sommes des pionniers de l'ingénierie moderne, mettant notre savoir-faire au service de projets d'envergure avec une rigueur et une qualité inégalées.
             </p>
             
             <div className="space-y-6 mb-10">
@@ -89,8 +84,8 @@ export default function WhyChooseUs() {
           >
             <div className="relative z-10 rounded-sm overflow-hidden shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1000" 
-                alt="Ingénieur utilisant une tablette sur un chantier"
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/images_traveau.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9pbWFnZXNfdHJhdmVhdS5wbmciLCJpYXQiOjE3NzMzMzY5MDQsImV4cCI6MjA4ODY5NjkwNH0.w8sWBaxjN5at8k9OM1J0JHRTo4P44I55Y1QG6ZgVcWc" 
+                alt="Travaux de construction EDCMIZ"
                 className="w-full h-auto"
                 referrerPolicy="no-referrer"
               />
