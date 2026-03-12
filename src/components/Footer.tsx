@@ -15,13 +15,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Company Info */}
           <div className="space-y-6">
-            <div className="flex flex-col">
-              <span className="text-3xl font-extrabold text-white tracking-tighter">
-                EDC<span className="text-accent">MIZ</span>
-              </span>
-              <span className="text-[10px] text-white/60 uppercase font-bold tracking-[0.2em] -mt-1">
-                Entreprise de Construction MIZAKU SARL
-              </span>
+            <div className="flex items-center">
+              <img 
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+                alt="EDCMIZ Logo" 
+                className="h-32 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <p className="text-white/60 text-sm leading-relaxed">
               Votre partenaire de confiance pour des infrastructures solides et des solutions numériques innovantes en RDC.

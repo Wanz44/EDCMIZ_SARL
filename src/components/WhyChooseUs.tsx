@@ -5,18 +5,23 @@ import { Cpu, BarChart3, Cloud, Construction, Zap, ShieldCheck } from 'lucide-re
 const reasons = [
   {
     icon: Cloud,
-    title: "Suivi Cloud en Temps Réel",
-    description: "Nous utilisons des plateformes cloud pour que nos clients puissent suivre l'avancement de leurs chantiers 24h/24, où qu'ils soient."
+    title: "Suivi Cloud & Reporting",
+    description: "Accédez à un tableau de bord en temps réel pour suivre l'avancement de vos travaux, les rapports journaliers et la consommation des ressources via notre plateforme cloud sécurisée."
   },
   {
     icon: BarChart3,
-    title: "Optimisation par la Data",
-    description: "L'analyse de données nous permet de prévoir les besoins en matériaux et d'optimiser les coûts de construction de manière chirurgicale."
+    title: "Analyse Prédictive des Coûts",
+    description: "Grâce à l'analyse de données historiques, nous optimisons l'approvisionnement en matériaux, réduisant les gaspillages de 15% et garantissant le respect strict de votre budget."
+  },
+  {
+    icon: Cpu,
+    title: "Ingénierie Assistée par IA",
+    description: "Nous utilisons des algorithmes d'optimisation pour concevoir des structures plus résistantes avec moins de matériaux, alliant durabilité écologique et économie financière."
   },
   {
     icon: ShieldCheck,
-    title: "Qualité Certifiée",
-    description: "La synergie entre nos ingénieurs civils et nos experts IT garantit une précision technique et une sécurité des données inégalées."
+    title: "Sécurité & Transparence",
+    description: "La traçabilité numérique de chaque étape du chantier garantit une transparence totale et une conformité rigoureuse aux normes de sécurité internationales."
   }
 ];
 
@@ -39,7 +44,7 @@ export default function WhyChooseUs() {
               EDCMIZ sarl n'est pas une entreprise de construction ordinaire. Nous sommes des pionniers de l'ingénierie moderne en RDC, fusionnant l'expertise du bâtiment avec la puissance du numérique.
             </p>
             
-            <div className="space-y-6">
+            <div className="space-y-6 mb-10">
               {reasons.map((reason, index) => (
                 <motion.div 
                   key={reason.title}
@@ -58,6 +63,21 @@ export default function WhyChooseUs() {
                   </div>
                 </motion.div>
               ))}
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200">
+              <div>
+                <p className="text-2xl font-black text-accent">-20%</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Coûts de matériaux</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-accent">+35%</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Vitesse d'exécution</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-accent">100%</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Transparence</p>
+              </div>
             </div>
           </motion.div>
           

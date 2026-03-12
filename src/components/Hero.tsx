@@ -35,16 +35,25 @@ export default function Hero() {
               Nous transformons vos visions en réalités durables avec rigueur et innovation.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
+              <motion.a
                 href="#contact"
-                className="bg-accent text-petrol-dark px-8 py-4 rounded-sm font-bold text-lg hover:bg-white transition-all flex items-center justify-center group shadow-xl"
+                initial={{ scale: 1 }}
+                animate={{ 
+                  scale: [1, 1.03, 1],
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="bg-accent text-petrol-dark px-10 py-5 rounded-sm font-extrabold text-xl hover:bg-white hover:scale-105 transition-all flex items-center justify-center group shadow-[0_0_20px_rgba(212,161,62,0.4)]"
               >
                 Demander un devis gratuit
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </a>
+                <ArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" size={24} />
+              </motion.a>
               <a
                 href="#services"
-                className="border-2 border-white text-white px-8 py-4 rounded-sm font-bold text-lg hover:bg-white hover:text-petrol-dark transition-all text-center"
+                className="border-2 border-white/30 text-white px-10 py-5 rounded-sm font-bold text-lg hover:bg-white hover:text-petrol-dark transition-all text-center backdrop-blur-sm"
               >
                 Nos Services
               </a>

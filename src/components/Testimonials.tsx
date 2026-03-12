@@ -18,7 +18,7 @@ const testimonials = [
 ];
 
 const partners = [
-  { name: "EDC MIZ", logo: "https://picsum.photos/seed/edcmiz/200/100" },
+  { name: "EDC MIZ", logo: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" },
   { name: "Gouvernement RDC", logo: "https://picsum.photos/seed/rdc/200/100" },
   { name: "Banque Centrale", logo: "https://picsum.photos/seed/bcc/200/100" },
   { name: "Regideso", logo: "https://picsum.photos/seed/regideso/200/100" },
@@ -71,7 +71,7 @@ export default function Testimonials() {
                 <img 
                   src={p.logo} 
                   alt={p.name} 
-                  className="h-12 object-contain"
+                  className="h-24 object-contain"
                   referrerPolicy="no-referrer"
                 />
               </div>
