@@ -1,0 +1,7 @@
+{
+  "name": "EDCMIZ sarl",
+  "description": "Site web officiel de EDCMIZ sarl - Entreprise de construction et solutions digitales à Kinshasa.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
