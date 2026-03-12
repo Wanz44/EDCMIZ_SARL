@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Twitter, Linkedin, Instagram, ArrowUp } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, ArrowUp, MessageCircle } from 'lucide-react';
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -27,6 +27,9 @@ export default function Footer() {
               Votre partenaire de confiance pour des infrastructures solides et des solutions numériques innovantes en RDC.
             </p>
             <div className="flex space-x-4">
+              <a href="https://wa.me/243829002360" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 flex items-center justify-center rounded-full hover:bg-accent hover:text-petrol-dark transition-all">
+                <MessageCircle size={18} />
+              </a>
               {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 bg-white/10 flex items-center justify-center rounded-full hover:bg-accent hover:text-petrol-dark transition-all">
                   <Icon size={18} />

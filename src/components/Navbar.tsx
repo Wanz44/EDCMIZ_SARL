@@ -56,7 +56,9 @@ export default function Navbar() {
                 </a>
               ))}
               <a
-                href="#contact"
+                href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-accent text-petrol-dark px-6 py-2 rounded-sm font-bold hover:bg-petrol-dark hover:text-white transition-colors uppercase text-sm shadow-lg"
               >
                 Devis Gratuit
@@ -94,7 +96,9 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#contact"
+              href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
               className="block bg-accent text-petrol-dark px-6 py-3 rounded-sm font-bold text-center uppercase text-sm"
             >

@@ -19,7 +19,11 @@ import {
   Lock,
   Globe,
   Smartphone,
-  Monitor
+  Monitor,
+  Hammer,
+  Paintbrush,
+  ClipboardList,
+  HardHat
 } from 'lucide-react';
 
 const btpServices = [
@@ -46,6 +50,30 @@ const btpServices = [
     description: "Aménagements hydro-agricoles et infrastructures pour le secteur rural.",
     icon: Sprout,
     image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Rénovation",
+    description: "Modernisation et remise à neuf de vos bâtiments existants avec expertise.",
+    icon: Hammer,
+    image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Ravalement",
+    description: "Nettoyage, réparation et embellissement des façades pour une longévité accrue.",
+    icon: Paintbrush,
+    image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Études",
+    description: "Analyses techniques approfondies et conception de plans d'ingénierie précis.",
+    icon: ClipboardList,
+    image: "https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Surveillance des travaux",
+    description: "Contrôle rigoureux des chantiers pour garantir le respect des normes et délais.",
+    icon: HardHat,
+    image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=800"
   }
 ];
 

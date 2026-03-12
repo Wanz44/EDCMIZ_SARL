@@ -36,7 +36,9 @@ export default function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <motion.a
-                href="#contact"
+                href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
+                target="_blank"
+                rel="noopener noreferrer"
                 initial={{ scale: 1 }}
                 animate={{ 
                   scale: [1, 1.03, 1],

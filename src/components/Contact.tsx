@@ -12,11 +12,14 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      alert('Veuillez remplir tous les champs');
+    if (!formData.name || !formData.message) {
+      alert('Veuillez remplir au moins votre nom et votre message');
       return;
     }
-    alert('Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+    
+    const whatsappMessage = `Bonjour EDCMIZ,%0A%0A*Nouveau message de contact*%0A*Nom:* ${formData.name}%0A*Email:* ${formData.email || 'Non précisé'}%0A*Sujet:* ${formData.subject}%0A*Message:* ${formData.message}`;
+    window.open(`https://wa.me/243829002360?text=${whatsappMessage}`, '_blank');
+    
     setFormData({ name: '', email: '', subject: 'Construction / BTP', message: '' });
   };
 
@@ -46,7 +49,7 @@ export default function Contact() {
               <div className="flex items-start mb-8 info-item">
                 <Phone className="text-accent mr-4 mt-1" size={24} />
                 <div>
-                  <h4 className="font-bold text-petrol-dark uppercase text-sm tracking-widest mb-2">Téléphone</h4>
+                  <h4 className="font-bold text-petrol-dark uppercase text-sm tracking-widest mb-2">WhatsApp / Tel</h4>
                   <p className="text-slate-600 text-sm">+243 829 002 360</p>
                 </div>
               </div>
@@ -127,9 +130,12 @@ export default function Contact() {
               </div>
               <div className="sm:col-span-2">
                 <button type="submit" className="w-full bg-accent text-petrol-dark font-bold uppercase tracking-widest py-4 rounded-sm hover:bg-accent-light transition-all flex items-center justify-center group shadow-lg">
-                  Envoyer le Message
+                  Envoyer via WhatsApp
                   <Send className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" size={18} />
                 </button>
+                <p className="text-[10px] text-slate-400 text-center mt-4 uppercase tracking-widest font-bold">
+                  Tout message et devis sera envoyé directement sur notre numéro WhatsApp
+                </p>
               </div>
             </form>
           </div>
