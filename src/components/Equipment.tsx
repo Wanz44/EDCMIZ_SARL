@@ -1,22 +1,24 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Truck, HardHat, Ruler, Server, Database, Shield } from 'lucide-react';
+import { Truck, HardHat, Ruler, Server, Database, Shield, Droplets, Smartphone, Lock } from 'lucide-react';
 
 const equipment = [
   {
     category: "Génie Civil & BTP",
     items: [
-      { name: "Parc d'engins lourds", icon: Truck, detail: "Bulldozers, excavatrices et chargeuses de dernière génération." },
-      { name: "Outils de topographie", icon: Ruler, detail: "Stations totales et drones pour relevés de précision." },
-      { name: "Équipements de sécurité", icon: Shield, detail: "Protection individuelle et collective aux normes ISO." }
+      { name: "Parc d'engins lourds", icon: Truck, detail: "Bulldozers D8, excavatrices 30T et chargeuses articulées." },
+      { name: "Matériel de Forage", icon: Droplets, detail: "Foreuses hydrauliques pour puits artésiens et études de sol." },
+      { name: "Topographie Laser", icon: Ruler, detail: "Stations totales Leica et drones RTK pour relevés millimétriques." },
+      { name: "Sécurité & HSE", icon: Shield, detail: "Équipements de protection certifiés et balisage de chantier haute visibilité." }
     ]
   },
   {
     category: "Infrastructure Digitale",
     items: [
-      { name: "Serveurs Haute Performance", icon: Server, detail: "Infrastructures locales et cloud sécurisées." },
-      { name: "Solutions de Stockage", icon: Database, detail: "Redondance des données et sauvegardes automatisées." },
-      { name: "Matériel Réseau", icon: HardHat, detail: "Équipements fibre optique et réseaux sans fil industriels." }
+      { name: "Serveurs Enterprise", icon: Server, detail: "Clusters haute disponibilité et stockage SAN redondant." },
+      { name: "Laboratoire Réseau", icon: Database, detail: "Bancs de test pour fibre optique et équipements Cisco/Ubiquiti." },
+      { name: "Unités Mobiles", icon: Smartphone, detail: "Kits de connectivité satellite pour chantiers en zones reculées." },
+      { name: "Sécurité Cyber", icon: Lock, detail: "Firewalls physiques et solutions de chiffrement de bout en bout." }
     ]
   }
 ];

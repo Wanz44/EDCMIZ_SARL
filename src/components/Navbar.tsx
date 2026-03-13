@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Phone, Mail, MessageCircle } from 'lucide-react';
+import { Menu, X, Phone, Mail, MessageCircle, Home, Info, Briefcase, HardHat, LayoutGrid, Newspaper, Send, FileText, Lock } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
 
 const navLinks = [
-  { name: 'Accueil', href: '#home' },
-  { name: 'À Propos', href: '#about' },
-  { name: 'Services', href: '#services' },
-  { name: 'Projets', href: '#projects' },
-  { name: 'Actualités', href: '#news' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Accueil', href: '#home', icon: Home },
+  { name: 'À Propos', href: '#about', icon: Info },
+  { name: 'Services', href: '#services', icon: Briefcase },
+  { name: 'Projets', href: '#projects', icon: HardHat },
+  { name: 'Vitrine', href: '#showcase', icon: LayoutGrid },
+  { name: 'Actualités', href: '#news', icon: Newspaper },
+  { name: 'Contact', href: '#contact', icon: Send },
 ];
 
 export default function Navbar() {
@@ -45,67 +47,96 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-1 xl:space-x-4">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-petrol-dark hover:text-accent font-medium transition-colors uppercase text-sm tracking-widest"
+                  className="group flex flex-col items-center px-3 py-2 text-petrol-dark hover:text-accent transition-all duration-300"
                 >
-                  {link.name}
+                  <link.icon size={18} className="mb-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                  <span className="uppercase text-[10px] xl:text-xs font-bold tracking-widest opacity-80 group-hover:opacity-100">
+                    {link.name}
+                  </span>
                 </a>
               ))}
-              <a
-                href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-accent text-petrol-dark px-6 py-2 rounded-sm font-bold hover:bg-petrol-dark hover:text-white transition-colors uppercase text-sm shadow-lg"
-              >
-                Devis Gratuit
-              </a>
+              <div className="pl-4 flex items-center gap-2">
+                <a
+                  href="#portal"
+                  className="border border-petrol-dark text-petrol-dark px-4 py-3 rounded-sm font-bold hover:bg-petrol-dark hover:text-white transition-all duration-300 uppercase text-xs flex items-center gap-2 group"
+                >
+                  <Lock size={14} />
+                  <span>Portail</span>
+                </a>
+                <a
+                  href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-accent text-petrol-dark px-5 py-3 rounded-sm font-black hover:bg-petrol-dark hover:text-white transition-all duration-300 uppercase text-xs shadow-lg flex items-center gap-2 group"
+                >
+                  <FileText size={16} className="group-hover:rotate-12 transition-transform" />
+                  <span>Devis Gratuit</span>
+                </a>
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center">
+            <div className="lg:hidden flex items-center">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="text-petrol-dark p-2"
+                className="text-petrol-dark p-2 hover:bg-slate-100 rounded-full transition-colors"
               >
-                {isOpen ? <X size={28} /> : <Menu size={28} />}
+                {isOpen ? <X size={32} /> : <Menu size={32} />}
               </button>
             </div>
           </div>
         </div>
 
         {/* Mobile Nav */}
-        <div
-          className={cn(
-            'md:hidden bg-white border-t border-slate-100 transition-all duration-300 overflow-hidden',
-            isOpen ? 'max-h-[500px] py-4' : 'max-h-0'
-          )}
-        >
-          <div className="px-4 space-y-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className="block text-petrol-dark hover:text-accent font-medium uppercase text-sm tracking-widest"
-              >
-                {link.name}
-              </a>
-            ))}
-            <a
-              href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
-              className="block bg-accent text-petrol-dark px-6 py-3 rounded-sm font-bold text-center uppercase text-sm"
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-white border-t border-slate-100 overflow-hidden"
             >
-              Devis Gratuit
-            </a>
-          </div>
-        </div>
+              <div className="px-4 py-8 grid grid-cols-2 gap-4">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center p-4 bg-slate-50 rounded-sm text-petrol-dark hover:bg-accent hover:text-petrol-dark transition-all group"
+                  >
+                    <link.icon size={20} className="mr-3 text-accent group-hover:text-petrol-dark" />
+                    <span className="uppercase text-xs font-bold tracking-widest">
+                      {link.name}
+                    </span>
+                  </a>
+                ))}
+                <a
+                  href="#portal"
+                  onClick={() => setIsOpen(false)}
+                  className="col-span-2 flex items-center justify-center border border-petrol-dark text-petrol-dark p-4 rounded-sm font-bold uppercase text-sm tracking-widest"
+                >
+                  <Lock size={20} className="mr-3" />
+                  Portail Client
+                </a>
+                <a
+                  href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="col-span-2 flex items-center justify-center bg-accent text-petrol-dark p-4 rounded-sm font-black uppercase text-sm tracking-widest shadow-inner"
+                >
+                  <FileText size={20} className="mr-3" />
+                  Devis Gratuit
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* WhatsApp Floating Button */}

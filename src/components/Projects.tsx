@@ -1,52 +1,61 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink, Plus } from 'lucide-react';
+import { ExternalLink, Plus, MapPin, Calendar, Clock } from 'lucide-react';
 
 const projects = [
   {
     id: 1,
-    title: 'Construction route Gombe',
+    title: 'Réfection Boulevard du 30 Juin',
     category: 'BTP',
     location: 'Kinshasa, Gombe',
-    duration: '6 mois',
+    duration: '12 mois',
     image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=800',
-    description: 'Réfection complète de 5km de voirie urbaine avec assainissement moderne.'
+    description: 'Réfection complète de la voirie urbaine avec assainissement moderne et éclairage public solaire.'
   },
   {
     id: 2,
-    title: "Réseau d'eau potable",
+    title: "Adduction d'eau potable",
     category: 'BTP',
     location: 'Maluku, Kinshasa',
-    duration: '4 mois',
+    duration: '8 mois',
     image: 'https://images.unsplash.com/photo-1542013936693-884638332954?auto=format&fit=crop&q=80&w=800',
-    description: "Adduction d'eau pour 10 000 habitants, incluant forage et châteaux d'eau."
+    description: "Forage industriel et réseau de distribution pour 15 000 habitants, incluant châteaux d'eau."
   },
   {
     id: 3,
-    title: 'Cloud Infrastructure',
-    category: 'Digital',
+    title: 'Rénovation Siège Social',
+    category: 'BTP',
     location: 'Kinshasa, Gombe',
-    duration: '3 mois',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800',
-    description: 'Migration cloud hybride sécurisée pour une institution bancaire majeure.'
+    duration: '5 mois',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800',
+    description: "Modernisation complète d'un immeuble de bureaux : façades, intérieur et domotique."
   },
   {
     id: 4,
-    title: 'Immeuble R+5',
+    title: 'Étude Technique Pont Lualaba',
     category: 'BTP',
-    location: 'Lubumbashi',
-    duration: '18 mois',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800',
-    description: "Construction d'un immeuble de bureaux intelligent avec gestion technique centralisée."
+    location: 'Kolwezi, Lualaba',
+    duration: '4 mois',
+    image: 'https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=800',
+    description: "Étude de faisabilité technique et plans d'ingénierie pour un pont de 120m."
   },
   {
     id: 5,
-    title: 'Data Center',
+    title: 'Infrastructure Cloud Bancaire',
     category: 'Digital',
-    location: 'Kinshasa, Limete',
-    duration: '8 mois',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=800',
-    description: "Installation d'un centre de données de haute disponibilité avec redondance énergétique."
+    location: 'Kinshasa, Gombe',
+    duration: '6 mois',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800',
+    description: 'Migration cloud hybride sécurisée pour une institution financière internationale.'
+  },
+  {
+    id: 6,
+    title: 'Surveillance Chantier Immeuble R+10',
+    category: 'BTP',
+    location: 'Lubumbashi',
+    duration: 'En cours',
+    image: 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=800',
+    description: "Supervision technique et contrôle qualité pour la construction d'un complexe résidentiel."
   }
 ];
 
@@ -117,12 +126,14 @@ export default function Projects() {
                 <div className="absolute inset-0 p-8 flex flex-col justify-end translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
                   <div className="flex justify-between items-start mb-4">
                     <p className="text-accent text-xs font-bold uppercase tracking-widest">{project.category}</p>
-                    <span className="text-[10px] bg-white/20 px-2 py-1 rounded-sm uppercase font-bold">{project.duration}</span>
+                    <span className="text-[10px] bg-white/20 px-2 py-1 rounded-sm uppercase font-bold flex items-center">
+                      <Clock size={10} className="mr-1" /> {project.duration}
+                    </span>
                   </div>
                   
-                  <h4 className="text-2xl font-bold mb-2">{project.title}</h4>
+                  <h4 className="text-2xl font-bold mb-2 leading-tight">{project.title}</h4>
                   <p className="text-accent/80 text-xs font-bold uppercase tracking-widest mb-4 flex items-center">
-                    <ExternalLink size={14} className="mr-2" /> {project.location}
+                    <MapPin size={14} className="mr-2" /> {project.location}
                   </p>
                   
                   <p className="text-white/70 text-sm mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-3">
