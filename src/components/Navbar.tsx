@@ -13,7 +13,11 @@ const navLinks = [
   { name: 'Contact', href: '#contact', icon: Send },
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  onOpenPortal: () => void;
+}
+
+export default function Navbar({ onOpenPortal }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -61,13 +65,13 @@ export default function Navbar() {
                 </a>
               ))}
               <div className="pl-4 flex items-center gap-2">
-                <a
-                  href="#portal"
+                <button
+                  onClick={onOpenPortal}
                   className="border border-petrol-dark text-petrol-dark px-4 py-3 rounded-sm font-bold hover:bg-petrol-dark hover:text-white transition-all duration-300 uppercase text-xs flex items-center gap-2 group"
                 >
                   <Lock size={14} />
                   <span>Portail</span>
-                </a>
+                </button>
                 <a
                   href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
                   target="_blank"
@@ -115,14 +119,16 @@ export default function Navbar() {
                     </span>
                   </a>
                 ))}
-                <a
-                  href="#portal"
-                  onClick={() => setIsOpen(false)}
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    onOpenPortal();
+                  }}
                   className="col-span-2 flex items-center justify-center border border-petrol-dark text-petrol-dark p-4 rounded-sm font-bold uppercase text-sm tracking-widest"
                 >
                   <Lock size={20} className="mr-3" />
                   Portail Client
-                </a>
+                </button>
                 <a
                   href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
                   target="_blank"

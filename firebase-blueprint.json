@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "A construction project in the portfolio",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Project title" },
+        "description": { "type": "string", "description": "Project description" },
+        "location": { "type": "string", "description": "Project location" },
+        "date": { "type": "string", "description": "Project date" },
+        "status": { "type": "string", "enum": ["En cours", "Terminé", "Étude"], "description": "Project status" },
+        "imageUrl": { "type": "string", "format": "uri", "description": "Main project image URL" },
+        "gallery": { "type": "array", "items": { "type": "string" }, "description": "Additional image URLs" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "status", "imageUrl"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "An enterprise service offering",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "iconName": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "description"]
+    },
+    "Prospect": {
+      "title": "Prospect",
+      "description": "A lead from the contact form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "type": { "type": "string", "description": "Type of work requested" },
+        "budget": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string", "enum": ["Nouveau", "Contacté", "Devis envoyé", "Gagné"], "description": "Lead status" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "status"]
+    },
+    "News": {
+      "title": "News",
+      "description": "Blog post or news article",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "date": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["title", "content"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Client feedback",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "rating": { "type": "number" }
+      },
+      "required": ["name", "content"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global app settings",
+      "type": "object",
+      "properties": {
+        "whatsapp": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "seoTitle": { "type": "string" },
+        "seoDescription": { "type": "string" }
+      }
+    },
+    "User": {
+      "title": "User",
+      "description": "Admin user profile",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "editor"] }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": { "schema": "Project", "description": "Portfolio projects" },
+    "/services/{serviceId}": { "schema": "Service", "description": "Company services" },
+    "/prospects/{prospectId}": { "schema": "Prospect", "description": "CRM leads" },
+    "/news/{newsId}": { "schema": "News", "description": "Blog articles" },
+    "/testimonials/{testimonialId}": { "schema": "Testimonial", "description": "Client reviews" },
+    "/settings/global": { "schema": "Settings", "description": "Global configuration" },
+    "/users/{userId}": { "schema": "User", "description": "Admin users" }
+  }
+}
