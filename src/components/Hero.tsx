@@ -82,7 +82,7 @@ export default function Hero() {
             >
               <div className="w-64 h-64 bg-accent/20 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center p-8 transform rotate-12 shadow-2xl">
                 <div className="text-center">
-                  <p className="text-white text-4xl font-black mb-2">15+</p>
+                  <p className="text-white text-4xl font-black mb-2">3+</p>
                   <p className="text-accent text-xs font-bold uppercase tracking-widest">Années d'Expérience</p>
                 </div>
               </div>
