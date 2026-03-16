@@ -11,6 +11,11 @@ import {
   Search, 
   Filter,
   ChevronRight,
+  ChevronLeft,
+  Menu,
+  Sun,
+  Moon,
+  X,
   MoreVertical,
   TrendingUp,
   Eye,
@@ -136,7 +141,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                 value={loginData.email}
                 onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
-                placeholder="ex: Email"
+                placeholder="ex: admin@edcmiz.com"
               />
             </div>
             <div>
@@ -215,12 +220,8 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         isSidebarCollapsed ? "w-20" : "w-64"
       )}>
         <div className="p-6 border-b border-white/10 flex items-center gap-3">
-              <img 
-                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDCmiz_blanc.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FRENtaXpfYmxhbmMucG5nIiwiaWF0IjoxNzczMzMzMzYyLCJleHAiOjIwODg2OTMzNjJ9.-edbmzs_YuQcdnQ7H5KtzfoyPs3RGLwlTkp8AO78ers" 
-                alt="EDCMIZ Logo" 
-                className="h-32 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
+          <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-petrol-dark font-black shadow-lg shrink-0">
+            EDC
           </div>
           {!isSidebarCollapsed && (
             <div className="overflow-hidden whitespace-nowrap">
@@ -280,8 +281,9 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                 "p-2 rounded-full transition-colors",
                 theme === 'dark' ? "text-slate-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-100"
               )}
+              title={isSidebarCollapsed ? "Développer le menu" : "Réduire le menu"}
             >
-              <LayoutDashboard size={20} />
+              {isSidebarCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
             </button>
             <button onClick={onClose} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
               <ArrowLeft size={20} />
@@ -301,8 +303,9 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                 "p-2 rounded-full transition-colors",
                 theme === 'dark' ? "text-yellow-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-100"
               )}
+              title={theme === 'light' ? "Passer au mode sombre" : "Passer au mode clair"}
             >
-              {theme === 'light' ? <Clock size={20} /> : <TrendingUp size={20} />}
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
             <div className="text-right hidden sm:block">
               <p className={cn(
@@ -474,6 +477,7 @@ function DashboardView() {
 function CRMView() {
   const [prospects, setProspects] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const path = 'prospects';
@@ -490,8 +494,17 @@ function CRMView() {
       handleFirestoreError(error, OperationType.LIST, path);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      setSearchTerm(''); // Clear search on unmount
+    };
   }, []);
+
+  const filteredProspects = prospects.filter(p => 
+    p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.phone?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
@@ -536,6 +549,8 @@ function CRMView() {
           <input 
             type="text" 
             placeholder="Rechercher un prospect..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </div>
@@ -560,7 +575,7 @@ function CRMView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {prospects.map((p) => (
+              {filteredProspects.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="text-sm font-bold text-slate-800">{p.name}</p>
@@ -598,7 +613,7 @@ function CRMView() {
                   </td>
                 </tr>
               ))}
-              {prospects.length === 0 && (
+              {filteredProspects.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic text-sm">
                     Aucun prospect trouvé.
@@ -757,7 +772,7 @@ function PortfolioView() {
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <h4 className="font-black text-petrol-dark uppercase tracking-tight">Ajouter un Projet</h4>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
-                <LogOut size={20} />
+                <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAddProject} className="p-8 space-y-6">
@@ -853,7 +868,7 @@ function PortfolioView() {
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Projet</h4>
               <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-600">
-                <LogOut size={20} />
+                <X size={20} />
               </button>
             </div>
             <form onSubmit={handleEditProject} className="p-8 space-y-6">
@@ -1081,7 +1096,7 @@ function ServicesView() {
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <h4 className="font-black text-petrol-dark uppercase tracking-tight">Ajouter un Service</h4>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
-                <LogOut size={20} />
+                <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAddService} className="p-8 space-y-6">
@@ -1166,7 +1181,7 @@ function ServicesView() {
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Service</h4>
               <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-600">
-                <LogOut size={20} />
+                <X size={20} />
               </button>
             </div>
             <form onSubmit={handleEditService} className="p-8 space-y-6">
@@ -1395,7 +1410,7 @@ function EquipmentView() {
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <h4 className="font-black text-petrol-dark uppercase tracking-tight">Ajouter un Équipement</h4>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
-                <LogOut size={20} />
+                <X size={20} />
               </button>
             </div>
             <form onSubmit={handleAddEquipment} className="p-8 space-y-6">
@@ -1484,7 +1499,7 @@ function EquipmentView() {
             <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier l'Équipement</h4>
               <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-600">
-                <LogOut size={20} />
+                <X size={20} />
               </button>
             </div>
             <form onSubmit={handleEditEquipment} className="p-8 space-y-6">
@@ -1574,6 +1589,19 @@ function CMSView() {
   const [activeSection, setActiveSection] = useState<'hero' | 'about' | 'why' | 'news' | 'testimonials'>('hero');
   const [content, setContent] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // News Management States
+  const [news, setNews] = useState<any[]>([]);
+  const [showAddNewsModal, setShowAddNewsModal] = useState(false);
+  const [showEditNewsModal, setShowEditNewsModal] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<any>(null);
+  const [newArticle, setNewArticle] = useState({
+    title: '',
+    content: '',
+    image: '',
+    date: new Date().toISOString().split('T')[0],
+    category: 'Actualité'
+  });
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -1607,7 +1635,66 @@ function CMSView() {
       }
     };
     fetchContent();
+
+    // Fetch News
+    const newsPath = 'news';
+    const q = query(collection(db, newsPath), orderBy('date', 'desc'));
+    const unsubscribeNews = onSnapshot(q, (snapshot) => {
+      setNews(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
+    return () => unsubscribeNews();
   }, []);
+
+  const handleAddNews = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'news'), {
+        ...newArticle,
+        createdAt: Timestamp.now()
+      });
+      setShowAddNewsModal(false);
+      setNewArticle({
+        title: '',
+        content: '',
+        image: '',
+        date: new Date().toISOString().split('T')[0],
+        category: 'Actualité'
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'news');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditNews = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingArticle) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'news', editingArticle.id), {
+        ...editingArticle,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditNewsModal(false);
+      setEditingArticle(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `news/${editingArticle.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteNews = async (id: string) => {
+    if (!confirm('Supprimer cet article ?')) return;
+    try {
+      await deleteDoc(doc(db, 'news', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `news/${id}`);
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -1753,11 +1840,58 @@ function CMSView() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Actualités & Blog</h4>
-              <button className="text-xs font-bold text-accent flex items-center gap-1 hover:underline">
+              <button 
+                onClick={() => setShowAddNewsModal(true)}
+                className="text-xs font-bold text-accent flex items-center gap-1 hover:underline"
+              >
                 <Plus size={14} /> Ajouter un article
               </button>
             </div>
-            <p className="text-sm text-slate-500 italic">La gestion détaillée des articles sera disponible dans une mise à jour prochaine. Vous pouvez modifier les titres globaux ici.</p>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {news.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 group">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-200">
+                    {item.image ? (
+                      <img src={item.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <Briefcase size={20} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-2 py-0.5 rounded">
+                        {item.category}
+                      </span>
+                      <span className="text-[10px] text-slate-400">{item.date}</span>
+                    </div>
+                    <h5 className="font-bold text-slate-800 text-sm truncate">{item.title}</h5>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => {
+                        setEditingArticle(item);
+                        setShowEditNewsModal(true);
+                      }}
+                      className="p-2 text-slate-400 hover:text-slate-600"
+                    >
+                      <Settings size={18} />
+                    </button>
+                    <button 
+                      onClick={() => deleteNews(item.id)}
+                      className="p-2 text-slate-400 hover:text-red-500"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {news.length === 0 && (
+                <p className="text-sm text-slate-500 italic py-8 text-center">Aucun article publié pour le moment.</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -1773,17 +1907,190 @@ function CMSView() {
           </div>
         )}
 
-        <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end">
-          <button 
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-8 py-3 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
-          >
-            {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-            Enregistrer les modifications
-          </button>
-        </div>
+        {activeSection !== 'news' && activeSection !== 'testimonials' && (
+          <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end">
+            <button 
+              onClick={handleSave}
+              disabled={isSaving}
+              className="px-8 py-3 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+            >
+              {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+              Enregistrer les modifications
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Modals for News */}
+      {showAddNewsModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Nouvel Article</h4>
+              <button onClick={() => setShowAddNewsModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddNews} className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre de l'article</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newArticle.title}
+                    onChange={e => setNewArticle({...newArticle, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={newArticle.category}
+                      onChange={e => setNewArticle({...newArticle, category: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Date de publication</label>
+                    <input 
+                      type="date" 
+                      required
+                      value={newArticle.date}
+                      onChange={e => setNewArticle({...newArticle, date: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
+                  <input 
+                    type="text" 
+                    value={newArticle.image}
+                    onChange={e => setNewArticle({...newArticle, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Contenu de l'article</label>
+                  <textarea 
+                    rows={8}
+                    required
+                    value={newArticle.content}
+                    onChange={e => setNewArticle({...newArticle, content: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddNewsModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Publier
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditNewsModal && editingArticle && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier l'Article</h4>
+              <button onClick={() => setShowEditNewsModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleEditNews} className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre de l'article</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingArticle.title}
+                    onChange={e => setEditingArticle({...editingArticle, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingArticle.category}
+                      onChange={e => setEditingArticle({...editingArticle, category: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Date de publication</label>
+                    <input 
+                      type="date" 
+                      required
+                      value={editingArticle.date}
+                      onChange={e => setEditingArticle({...editingArticle, date: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
+                  <input 
+                    type="text" 
+                    value={editingArticle.image}
+                    onChange={e => setEditingArticle({...editingArticle, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Contenu de l'article</label>
+                  <textarea 
+                    rows={8}
+                    required
+                    value={editingArticle.content}
+                    onChange={e => setEditingArticle({...editingArticle, content: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditNewsModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
