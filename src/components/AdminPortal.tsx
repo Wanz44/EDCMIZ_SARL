@@ -71,6 +71,8 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -134,7 +136,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                 value={loginData.email}
                 onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
-                placeholder="ex: admin@edcmiz.com"
+                placeholder="ex: Email"
               />
             </div>
             <div>
@@ -203,17 +205,29 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-100 flex p-4 gap-4 overflow-hidden">
+    <div className={cn(
+      "fixed inset-0 z-[100] flex p-4 gap-4 overflow-hidden transition-colors duration-300",
+      theme === 'dark' ? "bg-slate-900" : "bg-slate-100"
+    )}>
       {/* Sidebar - Floating Design */}
-      <aside className="w-64 bg-petrol-dark text-white flex flex-col shrink-0 rounded-2xl shadow-2xl overflow-hidden border border-white/5">
+      <aside className={cn(
+        "bg-petrol-dark text-white flex flex-col shrink-0 rounded-2xl shadow-2xl overflow-hidden border border-white/5 transition-all duration-300",
+        isSidebarCollapsed ? "w-20" : "w-64"
+      )}>
         <div className="p-6 border-b border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-petrol-dark font-black shadow-lg">
-            EDC
+              <img 
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDCmiz_blanc.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FRENtaXpfYmxhbmMucG5nIiwiaWF0IjoxNzczMzMzMzYyLCJleHAiOjIwODg2OTMzNjJ9.-edbmzs_YuQcdnQ7H5KtzfoyPs3RGLwlTkp8AO78ers" 
+                alt="EDCMIZ Logo" 
+                className="h-32 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
           </div>
-          <div>
-            <h1 className="font-bold text-sm leading-tight">Admin Portal</h1>
-            <p className="text-[10px] text-white/50 uppercase tracking-widest">EDCMIZ SARL</p>
-          </div>
+          {!isSidebarCollapsed && (
+            <div className="overflow-hidden whitespace-nowrap">
+              <h1 className="font-bold text-sm leading-tight">Admin Portal</h1>
+              <p className="text-[10px] text-white/50 uppercase tracking-widest">EDCMIZ SARL</p>
+            </div>
+          )}
         </div>
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
@@ -221,15 +235,17 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as Tab)}
+              title={isSidebarCollapsed ? item.label : undefined}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300",
                 activeTab === item.id 
                   ? "bg-accent text-petrol-dark shadow-lg shadow-accent/20 translate-x-1" 
-                  : "text-white/70 hover:bg-white/5 hover:text-white hover:translate-x-1"
+                  : "text-white/70 hover:bg-white/5 hover:text-white hover:translate-x-1",
+                isSidebarCollapsed && "justify-center px-0"
               )}
             >
               <item.icon size={18} />
-              {item.label}
+              {!isSidebarCollapsed && item.label}
             </button>
           ))}
         </nav>
@@ -237,38 +253,77 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         <div className="p-4 border-t border-white/10">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300"
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300",
+              isSidebarCollapsed && "justify-center px-0"
+            )}
           >
             <LogOut size={18} />
-            Déconnexion
+            {!isSidebarCollapsed && "Déconnexion"}
           </button>
         </div>
       </aside>
 
       {/* Main Content Area - Floating Design */}
-      <main className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-8 shrink-0 z-10">
+      <main className={cn(
+        "flex-1 flex flex-col rounded-2xl shadow-xl overflow-hidden border transition-colors duration-300",
+        theme === 'dark' ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
+      )}>
+        <header className={cn(
+          "h-20 backdrop-blur-md border-b flex items-center justify-between px-8 shrink-0 z-10 transition-colors duration-300",
+          theme === 'dark' ? "bg-slate-800/80 border-slate-700" : "bg-white/80 border-slate-100"
+        )}>
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+              className={cn(
+                "p-2 rounded-full transition-colors",
+                theme === 'dark' ? "text-slate-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-100"
+              )}
+            >
+              <LayoutDashboard size={20} />
+            </button>
             <button onClick={onClose} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h2 className="font-black text-petrol-dark capitalize text-xl tracking-tight">{activeTab.replace('-', ' ')}</h2>
+              <h2 className={cn(
+                "font-black capitalize text-xl tracking-tight",
+                theme === 'dark' ? "text-white" : "text-petrol-dark"
+              )}>{activeTab.replace('-', ' ')}</h2>
               <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em]">Gestion du contenu</p>
             </div>
           </div>
           <div className="flex items-center gap-6">
+            <button 
+              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              className={cn(
+                "p-2 rounded-full transition-colors",
+                theme === 'dark' ? "text-yellow-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-100"
+              )}
+            >
+              {theme === 'light' ? <Clock size={20} /> : <TrendingUp size={20} />}
+            </button>
             <div className="text-right hidden sm:block">
-              <p className="text-xs font-black text-petrol-dark">{user.email}</p>
+              <p className={cn(
+                "text-xs font-black",
+                theme === 'dark' ? "text-white" : "text-petrol-dark"
+              )}>{user.email}</p>
               <p className="text-[10px] text-accent uppercase font-bold tracking-widest">Administrateur Principal</p>
             </div>
-            <div className="w-12 h-12 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-center text-petrol shadow-inner">
+            <div className={cn(
+              "w-12 h-12 rounded-xl border flex items-center justify-center shadow-inner transition-colors",
+              theme === 'dark' ? "bg-slate-700 border-slate-600 text-accent" : "bg-slate-50 border-slate-200 text-petrol"
+            )}>
               <Users size={24} />
             </div>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-slate-50/30">
+        <div className={cn(
+          "flex-1 overflow-y-auto p-8 custom-scrollbar transition-colors duration-300",
+          theme === 'dark' ? "bg-slate-900/50" : "bg-slate-50/30"
+        )}>
           {renderContent()}
         </div>
       </main>
@@ -370,10 +425,10 @@ function DashboardView() {
           </h4>
           <div className="space-y-4">
             {[
-              { source: 'Facebook', percentage: 45, color: 'bg-blue-600' },
-              { source: 'Google Search', percentage: 30, color: 'bg-red-500' },
-              { source: 'LinkedIn', percentage: 15, color: 'bg-blue-800' },
-              { source: 'Direct', percentage: 10, color: 'bg-slate-400' },
+              { source: 'Facebook', percentage: 0, color: 'bg-blue-600' },
+              { source: 'Google Search', percentage: 0, color: 'bg-red-500' },
+              { source: 'LinkedIn', percentage: 0, color: 'bg-blue-800' },
+              { source: 'Direct', percentage: 0, color: 'bg-slate-400' },
             ].map((item) => (
               <div key={item.source}>
                 <div className="flex justify-between text-xs font-bold mb-1">
@@ -559,17 +614,94 @@ function CRMView() {
 }
 
 function PortfolioView() {
-  const projects = [
-    { id: 1, title: 'Immeuble Gombe R+10', location: 'Kinshasa', status: 'Terminé', image: 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=400' },
-    { id: 2, title: 'Villa Moderne Ngaliema', location: 'Kinshasa', status: 'En cours', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=400' },
-    { id: 3, title: 'Pont de Matadi (Réfection)', location: 'Kongo Central', status: 'Étude', image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=400' },
-  ];
+  const [projects, setProjects] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    location: '',
+    status: 'Terminé',
+    image: '',
+    category: 'BTP',
+    description: ''
+  });
+
+  useEffect(() => {
+    const path = 'projects';
+    const q = query(collection(db, path), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setIsLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, path);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleAddProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'projects'), {
+        ...newProject,
+        createdAt: Timestamp.now()
+      });
+      setShowAddModal(false);
+      setNewProject({
+        title: '',
+        location: '',
+        status: 'Terminé',
+        image: '',
+        category: 'BTP',
+        description: ''
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'projects');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'projects', editingProject.id), {
+        ...editingProject,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditModal(false);
+      setEditingProject(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `projects/${editingProject.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteProject = async (id: string) => {
+    if (!confirm('Supprimer ce projet ?')) return;
+    try {
+      await deleteDoc(doc(db, 'projects', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `projects/${id}`);
+    }
+  };
+
+  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-accent" /></div>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-slate-800">Gestion des Réalisations</h3>
-        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90"
+        >
           <Plus size={18} /> Nouveau Projet
         </button>
       </div>
@@ -589,40 +721,318 @@ function PortfolioView() {
                 <Users size={12} /> {project.location}
               </p>
               <div className="flex gap-2">
-                <button className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200 transition-colors">
+                <button 
+                  onClick={() => {
+                    setEditingProject(project);
+                    setShowEditModal(true);
+                  }}
+                  className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200 transition-colors"
+                >
                   Modifier
                 </button>
-                <button className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-red-50 text-red-500 transition-colors">
-                  <MoreVertical size={16} />
+                <button 
+                  onClick={() => deleteProject(project.id)}
+                  className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-red-50 text-red-500 transition-colors"
+                >
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
           </div>
         ))}
-        <button className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-8 text-slate-400 hover:border-accent hover:text-accent transition-all group">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-8 text-slate-400 hover:border-accent hover:text-accent transition-all group"
+        >
           <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-4 group-hover:bg-accent/10">
             <Plus size={24} />
           </div>
           <p className="text-sm font-bold">Ajouter un projet</p>
         </button>
       </div>
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Ajouter un Projet</h4>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+                <LogOut size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddProject} className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre du Projet</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newProject.title}
+                    onChange={e => setNewProject({...newProject, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Localisation</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newProject.location}
+                    onChange={e => setNewProject({...newProject, location: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut</label>
+                  <select 
+                    value={newProject.status}
+                    onChange={e => setNewProject({...newProject, status: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                  >
+                    <option value="Terminé">Terminé</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Étude">Étude</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                  <select 
+                    value={newProject.category}
+                    onChange={e => setNewProject({...newProject, category: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                  >
+                    <option value="BTP">BTP & Infrastructures</option>
+                    <option value="Digital">Digital & IT</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newProject.image}
+                    onChange={e => setNewProject({...newProject, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    value={newProject.description}
+                    onChange={e => setNewProject({...newProject, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && editingProject && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Projet</h4>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-600">
+                <LogOut size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleEditProject} className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre du Projet</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingProject.title}
+                    onChange={e => setEditingProject({...editingProject, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Localisation</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingProject.location}
+                    onChange={e => setEditingProject({...editingProject, location: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut</label>
+                  <select 
+                    value={editingProject.status}
+                    onChange={e => setEditingProject({...editingProject, status: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                  >
+                    <option value="Terminé">Terminé</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Étude">Étude</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                  <select 
+                    value={editingProject.category}
+                    onChange={e => setEditingProject({...editingProject, category: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                  >
+                    <option value="BTP">BTP & Infrastructures</option>
+                    <option value="Digital">Digital & IT</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingProject.image}
+                    onChange={e => setEditingProject({...editingProject, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    value={editingProject.description}
+                    onChange={e => setEditingProject({...editingProject, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function ServicesView() {
-  const services = [
-    { id: 1, title: 'Adduction d\'eau', status: 'Actif', icon: 'Droplets' },
-    { id: 2, title: 'Génie Civil', status: 'Actif', icon: 'Route' },
-    { id: 3, title: 'Construction Bâtiment', status: 'Actif', icon: 'Building2' },
-    { id: 4, title: 'Rénovation', status: 'Actif', icon: 'Hammer' },
-  ];
+  const [services, setServices] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingService, setEditingService] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newService, setNewService] = useState({
+    title: '',
+    description: '',
+    icon: 'Droplets',
+    image: '',
+    status: 'Actif'
+  });
+
+  useEffect(() => {
+    const path = 'services';
+    const q = query(collection(db, path), orderBy('title', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setServices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setIsLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, path);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleAddService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'services'), {
+        ...newService,
+        createdAt: Timestamp.now()
+      });
+      setShowAddModal(false);
+      setNewService({
+        title: '',
+        description: '',
+        icon: 'Droplets',
+        image: '',
+        status: 'Actif'
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'services');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingService) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'services', editingService.id), {
+        ...editingService,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditModal(false);
+      setEditingService(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `services/${editingService.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteService = async (id: string) => {
+    if (!confirm('Supprimer ce service ?')) return;
+    try {
+      await deleteDoc(doc(db, 'services', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `services/${id}`);
+    }
+  };
+
+  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-accent" /></div>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-slate-800">Gestion des Services</h3>
-        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90"
+        >
           <Plus size={18} /> Nouveau Service
         </button>
       </div>
@@ -640,12 +1050,200 @@ function ServicesView() {
               </div>
             </div>
             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button className="p-2 text-slate-400 hover:text-slate-600"><Settings size={18} /></button>
-              <button className="p-2 text-slate-400 hover:text-red-500"><AlertCircle size={18} /></button>
+              <button 
+                onClick={() => {
+                  setEditingService(s);
+                  setShowEditModal(true);
+                }}
+                className="p-2 text-slate-400 hover:text-slate-600"
+              >
+                <Settings size={18} />
+              </button>
+              <button 
+                onClick={() => deleteService(s.id)}
+                className="p-2 text-slate-400 hover:text-red-500"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
           </div>
         ))}
+        {services.length === 0 && (
+          <div className="col-span-full py-12 text-center text-slate-400 italic">
+            Aucun service enregistré.
+          </div>
+        )}
       </div>
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Ajouter un Service</h4>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+                <LogOut size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddService} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre du Service</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newService.title}
+                    onChange={e => setNewService({...newService, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    required
+                    value={newService.description}
+                    onChange={e => setNewService({...newService, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Icône (Lucide Name)</label>
+                    <input 
+                      type="text" 
+                      value={newService.icon}
+                      onChange={e => setNewService({...newService, icon: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut</label>
+                    <select 
+                      value={newService.status}
+                      onChange={e => setNewService({...newService, status: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="Actif">Actif</option>
+                      <option value="Inactif">Inactif</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image (Optionnel)</label>
+                  <input 
+                    type="text" 
+                    value={newService.image}
+                    onChange={e => setNewService({...newService, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && editingService && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Service</h4>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-600">
+                <LogOut size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleEditService} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre du Service</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingService.title}
+                    onChange={e => setEditingService({...editingService, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    required
+                    value={editingService.description}
+                    onChange={e => setEditingService({...editingService, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Icône (Lucide Name)</label>
+                    <input 
+                      type="text" 
+                      value={editingService.icon}
+                      onChange={e => setEditingService({...editingService, icon: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut</label>
+                    <select 
+                      value={editingService.status}
+                      onChange={e => setEditingService({...editingService, status: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="Actif">Actif</option>
+                      <option value="Inactif">Inactif</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image (Optionnel)</label>
+                  <input 
+                    type="text" 
+                    value={editingService.image}
+                    onChange={e => setEditingService({...editingService, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -653,10 +1251,21 @@ function ServicesView() {
 function EquipmentView() {
   const [equipment, setEquipment] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingEquip, setEditingEquip] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newEquip, setNewEquip] = useState({
+    name: '',
+    category: 'Engins de chantier',
+    status: 'Disponible',
+    imageUrl: '',
+    description: ''
+  });
 
   useEffect(() => {
     const path = 'equipment';
-    const q = query(collection(db, path));
+    const q = query(collection(db, path), orderBy('name', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setEquipment(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setIsLoading(false);
@@ -665,6 +1274,47 @@ function EquipmentView() {
     });
     return () => unsubscribe();
   }, []);
+
+  const handleAddEquipment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'equipment'), {
+        ...newEquip,
+        createdAt: Timestamp.now()
+      });
+      setShowAddModal(false);
+      setNewEquip({
+        name: '',
+        category: 'Engins de chantier',
+        status: 'Disponible',
+        imageUrl: '',
+        description: ''
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'equipment');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditEquipment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEquip) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'equipment', editingEquip.id), {
+        ...editingEquip,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditModal(false);
+      setEditingEquip(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `equipment/${editingEquip.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const deleteEquipment = async (id: string) => {
     if (!confirm('Voulez-vous vraiment supprimer cet équipement ?')) return;
@@ -676,54 +1326,244 @@ function EquipmentView() {
     }
   };
 
+  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-accent" size={32} /></div>;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-slate-800">Gestion du Parc Matériel</h3>
-        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90"
+        >
           <Plus size={18} /> Nouvel Équipement
         </button>
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="animate-spin text-accent" size={32} />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {equipment.map((item) => (
-            <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-              <div className="h-40 bg-slate-100 relative">
-                {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-300">
-                    <ImageIcon size={48} />
-                  </div>
-                )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {equipment.map((item) => (
+          <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm group">
+            <div className="h-40 bg-slate-100 relative">
+              {item.imageUrl ? (
+                <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                  <Briefcase size={48} />
+                </div>
+              )}
+              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => {
+                    setEditingEquip(item);
+                    setShowEditModal(true);
+                  }}
+                  className="p-2 bg-white/90 backdrop-blur shadow-sm rounded-lg text-slate-600 hover:text-accent"
+                >
+                  <Settings size={16} />
+                </button>
+                <button 
+                  onClick={() => deleteEquipment(item.id)}
+                  className="p-2 bg-white/90 backdrop-blur shadow-sm rounded-lg text-slate-600 hover:text-red-500"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
-              <div className="p-4">
-                <h4 className="font-bold text-slate-800">{item.name}</h4>
-                <p className="text-xs text-slate-500 mb-4">{item.category || 'Sans catégorie'}</p>
-                <div className="flex gap-2">
-                  <button className="flex-1 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200">
-                    Modifier
-                  </button>
-                  <button 
-                    onClick={() => deleteEquipment(item.id)}
-                    className="p-1.5 text-red-500 hover:bg-red-50 rounded-xl"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+              <div className="absolute bottom-2 left-2">
+                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                  item.status === 'Disponible' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                }`}>
+                  {item.status}
+                </span>
+              </div>
+            </div>
+            <div className="p-4">
+              <h4 className="font-bold text-slate-800">{item.name}</h4>
+              <p className="text-xs text-slate-500">{item.category || 'Sans catégorie'}</p>
+            </div>
+          </div>
+        ))}
+        {equipment.length === 0 && (
+          <div className="col-span-full py-12 text-center text-slate-400 italic">
+            Aucun équipement enregistré.
+          </div>
+        )}
+      </div>
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Ajouter un Équipement</h4>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+                <LogOut size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddEquipment} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nom de l'équipement</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newEquip.name}
+                    onChange={e => setNewEquip({...newEquip, name: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                    <select 
+                      value={newEquip.category}
+                      onChange={e => setNewEquip({...newEquip, category: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="Engins de chantier">Engins de chantier</option>
+                      <option value="Outillage">Outillage</option>
+                      <option value="Transport">Transport</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut</label>
+                    <select 
+                      value={newEquip.status}
+                      onChange={e => setNewEquip({...newEquip, status: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="Disponible">Disponible</option>
+                      <option value="En maintenance">En maintenance</option>
+                      <option value="Sur chantier">Sur chantier</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
+                  <input 
+                    type="text" 
+                    value={newEquip.imageUrl}
+                    onChange={e => setNewEquip({...newEquip, imageUrl: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    value={newEquip.description}
+                    onChange={e => setNewEquip({...newEquip, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
                 </div>
               </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && editingEquip && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier l'Équipement</h4>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-slate-600">
+                <LogOut size={20} />
+              </button>
             </div>
-          ))}
-          {equipment.length === 0 && (
-            <div className="col-span-full py-12 text-center text-slate-400 italic">
-              Aucun équipement enregistré.
-            </div>
-          )}
+            <form onSubmit={handleEditEquipment} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nom de l'équipement</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingEquip.name}
+                    onChange={e => setEditingEquip({...editingEquip, name: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                    <select 
+                      value={editingEquip.category}
+                      onChange={e => setEditingEquip({...editingEquip, category: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="Engins de chantier">Engins de chantier</option>
+                      <option value="Outillage">Outillage</option>
+                      <option value="Transport">Transport</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut</label>
+                    <select 
+                      value={editingEquip.status}
+                      onChange={e => setEditingEquip({...editingEquip, status: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="Disponible">Disponible</option>
+                      <option value="En maintenance">En maintenance</option>
+                      <option value="Sur chantier">Sur chantier</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
+                  <input 
+                    type="text" 
+                    value={editingEquip.imageUrl}
+                    onChange={e => setEditingEquip({...editingEquip, imageUrl: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    value={editingEquip.description}
+                    onChange={e => setEditingEquip({...editingEquip, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
