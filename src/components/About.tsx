@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Shield, Zap, Users, Target, Loader2 } from 'lucide-react';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 const stats = [
@@ -12,18 +12,28 @@ const stats = [
 ];
 
 export default function About() {
-  const [content, setContent] = useState<any>(null);
+  const [content, setContent] = useState<any>({
+    title: "Bâtir avec Rigueur, Innover avec Passion",
+    description: "Depuis sa création, EDCMIZ sarl s'est imposée comme un acteur majeur du BTP en République Démocratique du Congo. Notre mission est de transformer les défis techniques en réalisations durables, en alliant savoir-faire traditionnel et technologies de pointe.",
+    imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80",
+    experienceYears: "6+"
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const path = 'content/site';
     const unsubscribe = onSnapshot(doc(db, 'content', 'site'), (doc) => {
-      if (doc.exists()) {
+      if (doc.exists() && doc.data().about) {
         setContent(doc.data().about);
       }
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
     });
     return () => unsubscribe();
   }, []);
 
-  if (!content) {
+  if (loading && !content) {
     return (
       <section className="py-24 bg-white flex items-center justify-center">
         <Loader2 className="text-accent animate-spin" size={48} />

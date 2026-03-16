@@ -78,8 +78,46 @@
         "whatsapp": { "type": "string" },
         "email": { "type": "string" },
         "address": { "type": "string" },
-        "seoTitle": { "type": "string" },
-        "seoDescription": { "type": "string" }
+        "seo": {
+          "type": "object",
+          "properties": {
+            "home": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            },
+            "about": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            },
+            "services": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            },
+            "projects": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            },
+            "contact": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        }
       }
     },
     "User": {

@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function Hero() {
-  const [content, setContent] = useState<any>(null);
+  const [content, setContent] = useState<any>({
+    title: "L'Excellence dans la Construction. Partout en RDC.",
+    subtitle: "EDCMIZ SARL - BTP & GÉNIE CIVIL",
+    description: "Spécialiste en construction générale, adduction d'eau et solutions d'ingénierie moderne. Nous bâtissons l'avenir de la République Démocratique du Congo avec rigueur et expertise.",
+    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80",
+    ctaText: "Démarrer un Projet",
+    ctaLink: "https://wa.me/243829002360"
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const path = 'content/site';
     const unsubscribe = onSnapshot(doc(db, 'content', 'site'), (doc) => {
-      if (doc.exists()) {
+      if (doc.exists() && doc.data().hero) {
         setContent(doc.data().hero);
       }
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
     });
     return () => unsubscribe();
   }, []);
 
-  if (!content) {
+  if (loading && !content) {
     return (
       <section className="h-screen bg-petrol-dark flex items-center justify-center">
         <Loader2 className="text-accent animate-spin" size={48} />

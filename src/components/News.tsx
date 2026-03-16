@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, ArrowRight, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 export default function News() {
@@ -11,6 +11,7 @@ export default function News() {
   const [direction, setDirection] = useState(0);
 
   useEffect(() => {
+    const path = 'news';
     const q = query(collection(db, 'news'), orderBy('date', 'desc'), limit(5));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newsData = snapshot.docs.map(doc => ({
@@ -19,6 +20,8 @@ export default function News() {
       }));
       setNews(newsData);
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, path);
     });
     return () => unsubscribe();
   }, []);

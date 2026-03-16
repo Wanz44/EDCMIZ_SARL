@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Quote, Loader2, Star } from 'lucide-react';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, onSnapshot, query, limit } from 'firebase/firestore';
 
 export default function Testimonials() {
@@ -9,6 +9,7 @@ export default function Testimonials() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const path = 'testimonials';
     const q = query(collection(db, 'testimonials'), limit(3));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const testimonialsData = snapshot.docs.map(doc => ({
@@ -17,6 +18,8 @@ export default function Testimonials() {
       }));
       setTestimonials(testimonialsData);
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, path);
     });
     return () => unsubscribe();
   }, []);
