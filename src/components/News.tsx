@@ -1,60 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-
-const news = [
-  {
-    title: "Lancement du chantier d'adduction d'eau à Maluku",
-    date: "10 Mars 2026",
-    category: "BTP",
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=800",
-    excerpt: "Un nouveau projet vital pour les populations locales débute cette semaine avec nos équipes d'ingénierie."
-  },
-  {
-    title: "Migration Cloud réussie pour la Banque Centrale",
-    date: "02 Mars 2026",
-    category: "Digital",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-    excerpt: "Nos experts IT ont finalisé la migration des infrastructures critiques vers un cloud hybride sécurisé."
-  },
-  {
-    title: "Nouveaux engins de terrassement réceptionnés",
-    date: "25 Février 2026",
-    category: "Logistique",
-    image: "https://images.unsplash.com/photo-1579154273154-e66328906137?auto=format&fit=crop&q=80&w=800",
-    excerpt: "EDCMIZ renforce son parc matériel avec 5 nouveaux bulldozers pour accélérer les chantiers routiers."
-  },
-  {
-    title: "Inauguration du nouveau siège social",
-    date: "15 Février 2026",
-    category: "Corporate",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
-    excerpt: "Un espace moderne et écologique pour accueillir nos collaborateurs et clients dans les meilleures conditions."
-  },
-  {
-    title: "Partenariat stratégique pour l'énergie solaire",
-    date: "05 Février 2026",
-    category: "Énergie",
-    image: "https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?auto=format&fit=crop&q=80&w=800",
-    excerpt: "EDCMIZ s'allie à un leader mondial pour proposer des solutions d'énergie renouvelable en RDC."
-  }
-];
+import { Calendar, ArrowRight, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 export default function News() {
+  const [news, setNews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
+  useEffect(() => {
+    const q = query(collection(db, 'news'), orderBy('date', 'desc'), limit(5));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setNews(newsData);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const nextSlide = () => {
+    if (news.length === 0) return;
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % news.length);
   };
 
   const prevSlide = () => {
+    if (news.length === 0) return;
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + news.length) % news.length);
   };
 
   useEffect(() => {
+    if (news.length === 0) return;
     const timer = setInterval(nextSlide, 5000);
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') prevSlide();
@@ -65,7 +47,7 @@ export default function News() {
       clearInterval(timer);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentIndex]); // Added currentIndex to dependency to ensure slide functions have latest state if needed, though they use functional updates
+  }, [currentIndex, news.length]);
 
   const variants = {
     enter: (direction: number) => ({
@@ -83,6 +65,18 @@ export default function News() {
       opacity: 0
     })
   };
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-slate-50 flex items-center justify-center min-h-[600px]">
+        <Loader2 className="text-accent animate-spin" size={48} />
+      </section>
+    );
+  }
+
+  if (news.length === 0) {
+    return null;
+  }
 
   return (
     <section id="news" className="py-24 bg-slate-50 overflow-hidden">
@@ -141,7 +135,7 @@ export default function News() {
             >
               <div className="h-64 md:h-full relative overflow-hidden">
                 <img 
-                  src={news[currentIndex].image} 
+                  src={news[currentIndex].imageUrl} 
                   alt={news[currentIndex].title} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -153,7 +147,7 @@ export default function News() {
               <div className="p-8 md:p-12 flex flex-col justify-center">
                 <div className="flex items-center text-slate-400 text-sm mb-6">
                   <Calendar size={18} className="mr-2" />
-                  {news[currentIndex].date}
+                  {new Date(news[currentIndex].date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </div>
                 <h4 className="text-2xl md:text-3xl font-black text-petrol-dark mb-6 leading-tight">
                   {news[currentIndex].title}

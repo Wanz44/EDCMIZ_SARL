@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function Hero() {
+  const [content, setContent] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'content', 'site'), (doc) => {
+      if (doc.exists()) {
+        setContent(doc.data().hero);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!content) {
+    return (
+      <section className="h-screen bg-petrol-dark flex items-center justify-center">
+        <Loader2 className="text-accent animate-spin" size={48} />
+      </section>
+    );
+  }
+
   return (
     <section id="home" className="relative h-screen flex items-center overflow-hidden bg-petrol-dark">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/Architecture/ABC03.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9BcmNoaXRlY3R1cmUvQUJDMDMuanBnIiwiaWF0IjoxNzczNDQwMTk0LCJleHAiOjIwODg4MDAxOTR9.B3nGI31ZEc9sWtFkRIco6Ee3EM5DkBftHKsm9uArwjY"
+          src={content.imageUrl}
           alt="EDCMIZ Background"
           className="w-full h-full object-cover opacity-60"
           referrerPolicy="no-referrer"
@@ -25,19 +46,22 @@ export default function Hero() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-accent font-bold uppercase tracking-[0.3em] mb-4 text-sm sm:text-base">
-                Entreprise de Construction MIZAKU SARL
+                {content.subtitle}
               </h2>
               <h1 className="text-5xl sm:text-7xl font-black text-white leading-tight mb-8">
-                L'Excellence en <br />
-                <span className="text-accent">Construction</span> Générale.
+                {content.title.split('.').map((part: string, i: number) => (
+                  <React.Fragment key={i}>
+                    {part}{i === 0 && content.title.includes('.') && '.'}
+                    {i === 0 && <br />}
+                  </React.Fragment>
+                ))}
               </h1>
               <p className="text-lg sm:text-xl text-white/80 mb-10 leading-relaxed max-w-2xl">
-                Spécialiste des travaux de bâtiment, génie civil et rénovation. 
-                Nous bâtissons des structures solides et durables, adaptées à vos besoins les plus exigeants.
+                {content.description}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <motion.a
-                  href="https://wa.me/243829002360?text=Bonjour%20EDCMIZ,%20je%20souhaite%20demander%20un%20devis%20pour%20mon%20projet."
+                  href={content.ctaLink || "https://wa.me/243829002360"}
                   target="_blank"
                   rel="noopener noreferrer"
                   initial={{ scale: 1 }}
@@ -51,7 +75,7 @@ export default function Hero() {
                   }}
                   className="bg-accent text-petrol-dark px-10 py-5 rounded-sm font-extrabold text-xl hover:bg-white hover:scale-105 transition-all flex items-center justify-center group shadow-[0_0_20px_rgba(212,161,62,0.4)]"
                 >
-                  Demander un devis gratuit
+                  {content.ctaText}
                   <ArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" size={24} />
                 </motion.a>
                 <a
@@ -82,7 +106,7 @@ export default function Hero() {
             >
               <div className="w-64 h-64 bg-accent/20 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center p-8 transform rotate-12 shadow-2xl">
                 <div className="text-center">
-                  <p className="text-white text-4xl font-black mb-2">3+</p>
+                  <p className="text-white text-4xl font-black mb-2">6+</p>
                   <p className="text-accent text-xs font-bold uppercase tracking-widest">Années d'Expérience</p>
                 </div>
               </div>

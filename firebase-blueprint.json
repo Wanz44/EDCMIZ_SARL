@@ -91,6 +91,76 @@
         "role": { "type": "string", "enum": ["admin", "editor"] }
       },
       "required": ["email", "role"]
+    },
+    "SentEmail": {
+      "title": "SentEmail",
+      "description": "History of sent emails from admin",
+      "type": "object",
+      "properties": {
+        "to": { "type": "string", "format": "email" },
+        "subject": { "type": "string" },
+        "body": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["to", "subject", "body", "createdAt"]
+    },
+    "SiteContent": {
+      "title": "SiteContent",
+      "description": "Dynamic content for various sections of the site",
+      "type": "object",
+      "properties": {
+        "hero": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "subtitle": { "type": "string" },
+            "description": { "type": "string" },
+            "imageUrl": { "type": "string" },
+            "ctaText": { "type": "string" },
+            "ctaLink": { "type": "string" }
+          }
+        },
+        "about": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "imageUrl": { "type": "string" },
+            "experienceYears": { "type": "string" }
+          }
+        },
+        "whyChooseUs": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "subtitle": { "type": "string" },
+            "description": { "type": "string" },
+            "stats": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": "string" },
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Equipment": {
+      "title": "Equipment",
+      "description": "Heavy machinery and equipment",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["name", "imageUrl"]
     }
   },
   "firestore": {
@@ -100,6 +170,9 @@
     "/news/{newsId}": { "schema": "News", "description": "Blog articles" },
     "/testimonials/{testimonialId}": { "schema": "Testimonial", "description": "Client reviews" },
     "/settings/global": { "schema": "Settings", "description": "Global configuration" },
-    "/users/{userId}": { "schema": "User", "description": "Admin users" }
+    "/content/site": { "schema": "SiteContent", "description": "Dynamic site content" },
+    "/equipment/{equipmentId}": { "schema": "Equipment", "description": "Company equipment" },
+    "/users/{userId}": { "schema": "User", "description": "Admin users" },
+    "/sent_emails/{emailId}": { "schema": "SentEmail", "description": "Sent emails history" }
   }
 }

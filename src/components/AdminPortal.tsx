@@ -15,6 +15,9 @@ import {
   TrendingUp,
   Eye,
   MessageSquare,
+  Mail,
+  Send,
+  Inbox,
   ArrowLeft,
   Image as ImageIcon,
   CheckCircle2,
@@ -26,7 +29,11 @@ import {
   Route,
   Building2,
   Hammer,
-  Loader2
+  Loader2,
+  Trash2,
+  Save,
+  Upload,
+  Truck
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { auth, db, OperationType, handleFirestoreError } from '../lib/firebase';
@@ -44,10 +51,15 @@ import {
   doc, 
   updateDoc,
   deleteDoc,
+  addDoc,
+  setDoc,
+  getDoc,
+  getDocs,
   Timestamp
 } from 'firebase/firestore';
+import { GoogleGenAI } from "@google/genai";
 
-type Tab = 'dashboard' | 'portfolio' | 'services' | 'crm' | 'cms' | 'settings';
+type Tab = 'dashboard' | 'portfolio' | 'services' | 'equipment' | 'crm' | 'emails' | 'cms' | 'settings';
 
 interface AdminPortalProps {
   onClose: () => void;
@@ -100,7 +112,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   if (!user) {
     return (
       <div className="fixed inset-0 z-[100] bg-petrol-dark flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-sm shadow-2xl overflow-hidden">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="p-8 bg-accent text-petrol-dark text-center">
              <div className="flex items-center">
               <img 
@@ -121,7 +133,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                 required
                 value={loginData.email}
                 onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-slate-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
                 placeholder="ex: admin@edcmiz.com"
               />
             </div>
@@ -132,14 +144,14 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                 required
                 value={loginData.password}
                 onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                className="w-full px-4 py-3 border border-slate-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
                 placeholder="••••••••"
               />
             </div>
             <button 
               type="submit"
               disabled={isLoggingIn}
-              className="w-full bg-petrol-dark text-white py-4 rounded-sm font-black uppercase text-sm tracking-widest hover:bg-accent hover:text-petrol-dark transition-all shadow-lg disabled:opacity-50"
+              className="w-full bg-petrol-dark text-white py-4 rounded-xl font-black uppercase text-sm tracking-widest hover:bg-accent hover:text-petrol-dark transition-all shadow-lg disabled:opacity-50"
             >
               {isLoggingIn ? 'Connexion...' : 'Se Connecter'}
             </button>
@@ -160,7 +172,9 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
     { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
     { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
     { id: 'services', label: 'Services', icon: FileText },
+    { id: 'equipment', label: 'Équipements', icon: Hammer },
     { id: 'crm', label: 'Prospects (CRM)', icon: Users },
+    { id: 'emails', label: 'Emails & Messagerie', icon: Mail },
     { id: 'cms', label: 'Contenu Vitrine', icon: ImageIcon },
     { id: 'settings', label: 'Paramètres & SEO', icon: Settings },
   ];
@@ -171,10 +185,14 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         return <DashboardView />;
       case 'crm':
         return <CRMView />;
+      case 'emails':
+        return <EmailView />;
       case 'portfolio':
         return <PortfolioView />;
       case 'services':
         return <ServicesView />;
+      case 'equipment':
+        return <EquipmentView />;
       case 'cms':
         return <CMSView />;
       case 'settings':
@@ -185,11 +203,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-50 flex overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-64 bg-petrol-dark text-white flex flex-col shrink-0">
+    <div className="fixed inset-0 z-[100] bg-slate-100 flex p-4 gap-4 overflow-hidden">
+      {/* Sidebar - Floating Design */}
+      <aside className="w-64 bg-petrol-dark text-white flex flex-col shrink-0 rounded-2xl shadow-2xl overflow-hidden border border-white/5">
         <div className="p-6 border-b border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-accent rounded-sm flex items-center justify-center text-petrol-dark font-black">
+          <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-petrol-dark font-black shadow-lg">
             EDC
           </div>
           <div>
@@ -198,16 +216,16 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as Tab)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all",
+                "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300",
                 activeTab === item.id 
-                  ? "bg-accent text-petrol-dark" 
-                  : "text-white/70 hover:bg-white/5 hover:text-white"
+                  ? "bg-accent text-petrol-dark shadow-lg shadow-accent/20 translate-x-1" 
+                  : "text-white/70 hover:bg-white/5 hover:text-white hover:translate-x-1"
               )}
             >
               <item.icon size={18} />
@@ -219,7 +237,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         <div className="p-4 border-t border-white/10">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300"
           >
             <LogOut size={18} />
             Déconnexion
@@ -227,27 +245,30 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+      {/* Main Content Area - Floating Design */}
+      <main className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-8 shrink-0 z-10">
           <div className="flex items-center gap-4">
-            <button onClick={onClose} className="lg:hidden p-2 text-slate-500">
+            <button onClick={onClose} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
               <ArrowLeft size={20} />
             </button>
-            <h2 className="font-bold text-slate-800 capitalize">{activeTab.replace('-', ' ')}</h2>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="text-xs font-bold text-slate-800">{user.email}</p>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Administrateur</p>
+            <div>
+              <h2 className="font-black text-petrol-dark capitalize text-xl tracking-tight">{activeTab.replace('-', ' ')}</h2>
+              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em]">Gestion du contenu</p>
             </div>
-            <div className="w-10 h-10 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center text-slate-400">
-              <Users size={20} />
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="text-right hidden sm:block">
+              <p className="text-xs font-black text-petrol-dark">{user.email}</p>
+              <p className="text-[10px] text-accent uppercase font-bold tracking-widest">Administrateur Principal</p>
+            </div>
+            <div className="w-12 h-12 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-center text-petrol shadow-inner">
+              <Users size={24} />
             </div>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-slate-50/30">
           {renderContent()}
         </div>
       </main>
@@ -256,34 +277,93 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
 }
 
 function DashboardView() {
-  const stats = [
-    { label: 'Visiteurs (Aujourd\'hui)', value: '124', change: '+12%', icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Pages les plus vues', value: 'Portfolio', change: '85%', icon: Eye, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'Nouveaux Prospects', value: '8', change: '+3', icon: MessageSquare, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { label: 'Taux de Conversion', value: '4.2%', change: '+0.5%', icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-50' },
+  const [stats, setStats] = useState({
+    prospects: 0,
+    projects: 0,
+    equipment: 0,
+    sentEmails: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  const resetStats = () => {
+    setStats({
+      prospects: 0,
+      projects: 0,
+      equipment: 0,
+      sentEmails: 0
+    });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const prospectsSnap = await getDocs(collection(db, 'prospects'));
+        const projectsSnap = await getDocs(collection(db, 'projects'));
+        const equipmentSnap = await getDocs(collection(db, 'equipment'));
+        const emailsSnap = await getDocs(collection(db, 'sent_emails'));
+
+        setStats({
+          prospects: prospectsSnap.size,
+          projects: projectsSnap.size,
+          equipment: equipmentSnap.size,
+          sentEmails: emailsSnap.size
+        });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="text-accent animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  const statCards = [
+    { label: 'Prospects', value: stats.prospects, icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: 'Projets', value: stats.projects, icon: Briefcase, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { label: 'Équipements', value: stats.equipment, icon: Truck, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { label: 'Emails Envoyés', value: stats.sentEmails, icon: Mail, color: 'text-purple-500', bg: 'bg-purple-50' },
   ];
 
   return (
     <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-black text-petrol-dark">Vue d'ensemble</h3>
+          <p className="text-slate-500 text-sm">Statistiques en temps réel de votre activité.</p>
+        </div>
+        <button 
+          onClick={resetStats}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200 transition-colors"
+        >
+          <Clock size={14} />
+          Réinitialiser l'affichage
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-white p-6 rounded-sm border border-slate-200 shadow-sm">
+        {statCards.map((stat) => (
+          <div key={stat.label} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
             <div className="flex items-center justify-between mb-4">
-              <div className={cn("p-3 rounded-sm", stat.bg, stat.color)}>
+              <div className={cn("p-4 rounded-xl transition-transform group-hover:scale-110 duration-300", stat.bg, stat.color)}>
                 <stat.icon size={24} />
               </div>
-              <span className="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">
-                {stat.change}
-              </span>
             </div>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">{stat.label}</p>
-            <h3 className="text-2xl font-black text-slate-800">{stat.value}</h3>
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+            <h3 className="text-3xl font-black text-petrol-dark">{stat.value}</h3>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-8 rounded-sm border border-slate-200 shadow-sm">
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h4 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
             <BarChart3 size={20} className="text-accent" />
             Provenance des Visiteurs
@@ -308,7 +388,7 @@ function DashboardView() {
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-sm border border-slate-200 shadow-sm">
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h4 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
             <Clock size={20} className="text-accent" />
             Activités Récentes
@@ -401,17 +481,17 @@ function CRMView() {
           <input 
             type="text" 
             placeholder="Rechercher un prospect..." 
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-accent/50"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-sm text-sm font-bold text-slate-600 hover:bg-slate-50">
+          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50">
             <Filter size={18} /> Filtrer
           </button>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -433,7 +513,7 @@ function CRMView() {
                     {p.email && <p className="text-[10px] text-slate-400 italic">{p.email}</p>}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-sm">{p.type}</span>
+                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">{p.type}</span>
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-sm font-bold text-slate-800">{p.budget || 'N/A'}</p>
@@ -489,14 +569,14 @@ function PortfolioView() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-slate-800">Gestion des Réalisations</h3>
-        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-sm text-sm font-bold hover:bg-accent/90">
+        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90">
           <Plus size={18} /> Nouveau Projet
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <div key={project.id} className="bg-white border border-slate-200 rounded-sm overflow-hidden shadow-sm group">
+          <div key={project.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm group">
             <div className="h-48 relative overflow-hidden">
               <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-petrol-dark">
@@ -509,17 +589,17 @@ function PortfolioView() {
                 <Users size={12} /> {project.location}
               </p>
               <div className="flex gap-2">
-                <button className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-sm text-xs font-bold hover:bg-slate-200 transition-colors">
+                <button className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200 transition-colors">
                   Modifier
                 </button>
-                <button className="p-2 bg-slate-100 text-slate-600 rounded-sm hover:bg-red-50 text-red-500 transition-colors">
+                <button className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-red-50 text-red-500 transition-colors">
                   <MoreVertical size={16} />
                 </button>
               </div>
             </div>
           </div>
         ))}
-        <button className="border-2 border-dashed border-slate-200 rounded-sm flex flex-col items-center justify-center p-8 text-slate-400 hover:border-accent hover:text-accent transition-all group">
+        <button className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-8 text-slate-400 hover:border-accent hover:text-accent transition-all group">
           <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-4 group-hover:bg-accent/10">
             <Plus size={24} />
           </div>
@@ -542,16 +622,16 @@ function ServicesView() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-slate-800">Gestion des Services</h3>
-        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-sm text-sm font-bold hover:bg-accent/90">
+        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90">
           <Plus size={18} /> Nouveau Service
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {services.map((s) => (
-          <div key={s.id} className="bg-white p-6 border border-slate-200 rounded-sm flex items-center justify-between group">
+          <div key={s.id} className="bg-white p-6 border border-slate-200 rounded-2xl flex items-center justify-between group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-slate-50 text-accent rounded-sm flex items-center justify-center">
+              <div className="w-12 h-12 bg-slate-50 text-accent rounded-xl flex items-center justify-center">
                 <FileText size={24} />
               </div>
               <div>
@@ -570,35 +650,288 @@ function ServicesView() {
   );
 }
 
-function CMSView() {
+function EquipmentView() {
+  const [equipment, setEquipment] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'equipment'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setEquipment(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const deleteEquipment = async (id: string) => {
+    if (!confirm('Voulez-vous vraiment supprimer cet équipement ?')) return;
+    try {
+      await deleteDoc(doc(db, 'equipment', id));
+    } catch (error) {
+      console.error('Error deleting equipment:', error);
+    }
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 border border-slate-200 rounded-sm shadow-sm">
-          <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Newspaper size={18} className="text-accent" /> Actualités
-          </h4>
-          <p className="text-xs text-slate-500 mb-6">Gérez vos articles de blog et annonces officielles.</p>
-          <button className="w-full py-2 bg-slate-100 text-slate-600 rounded-sm text-xs font-bold hover:bg-accent hover:text-petrol-dark transition-all">
-            Gérer les articles
-          </button>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-bold text-slate-800">Gestion du Parc Matériel</h3>
+        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-petrol-dark rounded-xl text-sm font-bold hover:bg-accent/90">
+          <Plus size={18} /> Nouvel Équipement
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="animate-spin text-accent" size={32} />
         </div>
-        <div className="bg-white p-6 border border-slate-200 rounded-sm shadow-sm">
-          <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <MessageSquare size={18} className="text-accent" /> Témoignages
-          </h4>
-          <p className="text-xs text-slate-500 mb-6">Ajoutez ou modifiez les avis de vos clients satisfaits.</p>
-          <button className="w-full py-2 bg-slate-100 text-slate-600 rounded-sm text-xs font-bold hover:bg-accent hover:text-petrol-dark transition-all">
-            Gérer les avis
-          </button>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {equipment.map((item) => (
+            <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <div className="h-40 bg-slate-100 relative">
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-300">
+                    <ImageIcon size={48} />
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <h4 className="font-bold text-slate-800">{item.name}</h4>
+                <p className="text-xs text-slate-500 mb-4">{item.category || 'Sans catégorie'}</p>
+                <div className="flex gap-2">
+                  <button className="flex-1 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200">
+                    Modifier
+                  </button>
+                  <button 
+                    onClick={() => deleteEquipment(item.id)}
+                    className="p-1.5 text-red-500 hover:bg-red-50 rounded-xl"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {equipment.length === 0 && (
+            <div className="col-span-full py-12 text-center text-slate-400 italic">
+              Aucun équipement enregistré.
+            </div>
+          )}
         </div>
-        <div className="bg-white p-6 border border-slate-200 rounded-sm shadow-sm">
-          <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Users size={18} className="text-accent" /> Partenaires
-          </h4>
-          <p className="text-xs text-slate-500 mb-6">Mettez à jour les logos de vos partenaires stratégiques.</p>
-          <button className="w-full py-2 bg-slate-100 text-slate-600 rounded-sm text-xs font-bold hover:bg-accent hover:text-petrol-dark transition-all">
-            Gérer les logos
+      )}
+    </div>
+  );
+}
+
+function CMSView() {
+  const [activeSection, setActiveSection] = useState<'hero' | 'about' | 'why' | 'news' | 'testimonials'>('hero');
+  const [content, setContent] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      const docRef = doc(db, 'content', 'site');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setContent(docSnap.data());
+      } else {
+        // Initial state if not exists
+        setContent({
+          hero: {
+            title: "L'Excellence en Construction Générale.",
+            subtitle: "Entreprise de Construction MIZAKU SARL",
+            description: "Spécialiste des travaux de bâtiment, génie civil et rénovation. Nous bâtissons des structures solides et durables.",
+            imageUrl: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/Architecture/ABC03.jpg",
+            ctaText: "Demander un devis gratuit",
+            ctaLink: "https://wa.me/243829002360"
+          },
+          about: {
+            title: "Bâtir l'Avenir avec Rigueur et Innovation",
+            description: "EDCMIZ sarl est une entreprise leader en République Démocratique du Congo...",
+            imageUrl: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/Architecture/ABC01.jpg",
+            experienceYears: "6+"
+          }
+        });
+      }
+    };
+    fetchContent();
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await setDoc(doc(db, 'content', 'site'), content);
+      alert('Contenu mis à jour avec succès !');
+    } catch (error) {
+      console.error('Error saving content:', error);
+      alert('Erreur lors de l\'enregistrement.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!content) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-accent" /></div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4 border-b border-slate-200 pb-4">
+        <button 
+          onClick={() => setActiveSection('hero')}
+          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'hero' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+        >
+          Hero
+        </button>
+        <button 
+          onClick={() => setActiveSection('about')}
+          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'about' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+        >
+          À Propos
+        </button>
+        <button 
+          onClick={() => setActiveSection('news')}
+          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+        >
+          Actualités
+        </button>
+        <button 
+          onClick={() => setActiveSection('testimonials')}
+          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'testimonials' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+        >
+          Témoignages
+        </button>
+      </div>
+
+      <div className="bg-white p-8 border border-slate-200 rounded-2xl shadow-sm max-w-4xl">
+        {activeSection === 'hero' && (
+          <div className="space-y-6">
+            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Section Hero</h4>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sous-titre (H2)</label>
+                <input 
+                  type="text" 
+                  value={content.hero.subtitle}
+                  onChange={e => setContent({...content, hero: {...content.hero, subtitle: e.target.value}})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre Principal (H1)</label>
+                <input 
+                  type="text" 
+                  value={content.hero.title}
+                  onChange={e => setContent({...content, hero: {...content.hero, title: e.target.value}})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                <textarea 
+                  rows={3}
+                  value={content.hero.description}
+                  onChange={e => setContent({...content, hero: {...content.hero, description: e.target.value}})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Image de fond (URL)</label>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={content.hero.imageUrl}
+                    onChange={e => setContent({...content, hero: {...content.hero, imageUrl: e.target.value}})}
+                    className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                  <button className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200">
+                    <Upload size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'about' && (
+          <div className="space-y-6">
+            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Section À Propos</h4>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre</label>
+                <input 
+                  type="text" 
+                  value={content.about.title}
+                  onChange={e => setContent({...content, about: {...content.about, title: e.target.value}})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                <textarea 
+                  rows={6}
+                  value={content.about.description}
+                  onChange={e => setContent({...content, about: {...content.about, description: e.target.value}})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Années d'Expérience</label>
+                  <input 
+                    type="text" 
+                    value={content.about.experienceYears}
+                    onChange={e => setContent({...content, about: {...content.about, experienceYears: e.target.value}})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Image (URL)</label>
+                  <input 
+                    type="text" 
+                    value={content.about.imageUrl}
+                    onChange={e => setContent({...content, about: {...content.about, imageUrl: e.target.value}})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'news' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Actualités & Blog</h4>
+              <button className="text-xs font-bold text-accent flex items-center gap-1 hover:underline">
+                <Plus size={14} /> Ajouter un article
+              </button>
+            </div>
+            <p className="text-sm text-slate-500 italic">La gestion détaillée des articles sera disponible dans une mise à jour prochaine. Vous pouvez modifier les titres globaux ici.</p>
+          </div>
+        )}
+
+        {activeSection === 'testimonials' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Témoignages Clients</h4>
+              <button className="text-xs font-bold text-accent flex items-center gap-1 hover:underline">
+                <Plus size={14} /> Ajouter un avis
+              </button>
+            </div>
+            <p className="text-sm text-slate-500 italic">La gestion détaillée des témoignages sera disponible dans une mise à jour prochaine.</p>
+          </div>
+        )}
+
+        <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end">
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="px-8 py-3 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+          >
+            {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+            Enregistrer les modifications
           </button>
         </div>
       </div>
@@ -607,46 +940,393 @@ function CMSView() {
 }
 
 function SettingsView() {
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleResetData = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir réinitialiser les compteurs ? Cela supprimera tous les prospects et l'historique des emails.")) return;
+    
+    setIsResetting(true);
+    try {
+      // We don't actually delete everything to avoid accidents, but we clear the main "counters" collections
+      const prospects = await getDocs(collection(db, 'prospects'));
+      const emails = await getDocs(collection(db, 'sent_emails'));
+      
+      const deletePromises = [
+        ...prospects.docs.map(d => deleteDoc(doc(db, 'prospects', d.id))),
+        ...emails.docs.map(d => deleteDoc(doc(db, 'sent_emails', d.id)))
+      ];
+      
+      await Promise.all(deletePromises);
+      alert("Données réinitialisées avec succès.");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error resetting data:", error);
+      alert("Erreur lors de la réinitialisation.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl space-y-8">
-      <div className="bg-white p-8 border border-slate-200 rounded-sm shadow-sm">
+      <div className="bg-white p-8 border border-slate-200 rounded-2xl shadow-sm">
         <h4 className="font-bold text-slate-800 mb-6">Informations de Contact</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Numéro WhatsApp</label>
-            <input type="text" defaultValue="+243 829 002 360" className="w-full px-4 py-2 border border-slate-200 rounded-sm text-sm" />
+            <input type="text" defaultValue="+243 829 002 360" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Email Contact</label>
-            <input type="email" defaultValue="contact@edcmiz.com" className="w-full px-4 py-2 border border-slate-200 rounded-sm text-sm" />
+            <input type="email" defaultValue="contact@edcmiz.com" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" />
           </div>
           <div className="md:col-span-2 space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Adresse Physique (Kinshasa)</label>
-            <input type="text" defaultValue="Av. de la Justice, Gombe, Kinshasa" className="w-full px-4 py-2 border border-slate-200 rounded-sm text-sm" />
+            <input type="text" defaultValue="Av. de la Justice, Gombe, Kinshasa" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-8 border border-slate-200 rounded-sm shadow-sm">
+      <div className="bg-white p-8 border border-slate-200 rounded-2xl shadow-sm">
         <h4 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
           <Search size={20} className="text-accent" /> Optimisation SEO
         </h4>
         <div className="space-y-6">
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Meta Title (Accueil)</label>
-            <input type="text" defaultValue="EDCMIZ SARL | Excellence en Construction Générale en RDC" className="w-full px-4 py-2 border border-slate-200 rounded-sm text-sm" />
+            <input type="text" defaultValue="EDCMIZ SARL | Excellence en Construction Générale en RDC" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Meta Description</label>
-            <textarea rows={3} defaultValue="Spécialiste en BTP, génie civil et solutions digitales en République Démocratique du Congo. Nous bâtissons l'avenir avec expertise." className="w-full px-4 py-2 border border-slate-200 rounded-sm text-sm" />
+            <textarea rows={3} defaultValue="Spécialiste en BTP, génie civil et solutions digitales en République Démocratique du Congo. Nous bâtissons l'avenir avec expertise." className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" />
           </div>
         </div>
       </div>
 
+      <div className="bg-white p-8 border border-red-100 rounded-2xl shadow-sm">
+        <h4 className="font-bold text-red-600 mb-4 flex items-center gap-2">
+          <AlertCircle size={20} /> Zone de Danger
+        </h4>
+        <p className="text-sm text-slate-500 mb-6">Réinitialiser les compteurs de l'activité (Prospects et Emails envoyés).</p>
+        <button 
+          onClick={handleResetData}
+          disabled={isResetting}
+          className="px-6 py-3 bg-red-50 text-red-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all disabled:opacity-50"
+        >
+          {isResetting ? 'Réinitialisation...' : 'Remettre les compteurs à ZERO'}
+        </button>
+      </div>
+
       <div className="flex justify-end">
-        <button className="px-8 py-4 bg-petrol-dark text-white rounded-sm font-black uppercase text-sm tracking-widest hover:bg-accent hover:text-petrol-dark transition-all">
+        <button className="px-8 py-4 bg-petrol-dark text-white rounded-xl font-black uppercase text-sm tracking-widest hover:bg-accent hover:text-petrol-dark transition-all">
           Enregistrer les modifications
         </button>
+      </div>
+    </div>
+  );
+}
+
+function EmailView() {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [sentEmails, setSentEmails] = useState<any[]>([]);
+  const [view, setView] = useState<'inbox' | 'sent' | 'compose'>('inbox');
+  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [isDrafting, setIsDrafting] = useState(false);
+  const [composeData, setComposeData] = useState({
+    to: '',
+    subject: '',
+    body: ''
+  });
+
+  useEffect(() => {
+    const q = query(collection(db, 'prospects'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const q = query(collection(db, 'sent_emails'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setSentEmails(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, 'sent_emails'), {
+        ...composeData,
+        createdAt: Timestamp.now(),
+        status: 'sent'
+      });
+      
+      // Open mailto as a fallback for real sending
+      const mailtoUrl = `mailto:${composeData.to}?subject=${encodeURIComponent(composeData.subject)}&body=${encodeURIComponent(composeData.body)}`;
+      window.open(mailtoUrl);
+      
+      alert('Email enregistré dans l\'historique et prêt à être envoyé via votre client mail.');
+      setView('sent');
+      setComposeData({ to: '', subject: '', body: '' });
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+  };
+
+  const generateDraft = async () => {
+    if (!selectedMessage) return;
+    setIsDrafting(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Rédige une réponse professionnelle et courtoise en français pour EDCMIZ SARL (entreprise de construction en RDC) à ce message de prospect:
+        Nom: ${selectedMessage.name}
+        Message: ${selectedMessage.message}
+        
+        La réponse doit être chaleureuse, professionnelle et inviter à un rendez-vous ou un appel.`,
+      });
+      
+      setComposeData({
+        to: selectedMessage.email,
+        subject: `Réponse à votre demande - EDCMIZ SARL`,
+        body: response.text || ''
+      });
+      setView('compose');
+    } catch (error) {
+      console.error('AI error:', error);
+      alert('Erreur lors de la génération du brouillon.');
+    } finally {
+      setIsDrafting(false);
+    }
+  };
+
+  return (
+    <div className="flex h-full bg-white border border-slate-200 rounded-2xl overflow-hidden">
+      {/* Email Sidebar */}
+      <div className="w-64 border-r border-slate-200 flex flex-col shrink-0">
+        <div className="p-4 border-b border-slate-200">
+          <button 
+            onClick={() => setView('compose')}
+            className="w-full py-2 bg-accent text-petrol-dark rounded-xl text-xs font-black uppercase tracking-widest hover:bg-accent/90 flex items-center justify-center gap-2"
+          >
+            <Plus size={16} /> Nouveau Message
+          </button>
+        </div>
+        <nav className="flex-1 p-2 space-y-1">
+          <button 
+            onClick={() => setView('inbox')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-bold transition-all",
+              view === 'inbox' ? "bg-slate-100 text-petrol" : "text-slate-500 hover:bg-slate-50"
+            )}
+          >
+            <Inbox size={16} /> Boîte de réception
+            {messages.length > 0 && (
+              <span className="ml-auto bg-accent text-petrol-dark px-1.5 py-0.5 rounded-full text-[10px]">
+                {messages.length}
+              </span>
+            )}
+          </button>
+          <button 
+            onClick={() => setView('sent')}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-bold transition-all",
+              view === 'sent' ? "bg-slate-100 text-petrol" : "text-slate-500 hover:bg-slate-50"
+            )}
+          >
+            <Send size={16} /> Messages envoyés
+          </button>
+        </nav>
+      </div>
+
+      {/* Email Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {view === 'compose' ? (
+          <div className="p-8 max-w-3xl">
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <Send size={20} className="text-accent" /> Nouveau Message
+            </h3>
+            <form onSubmit={handleSend} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">À (Email)</label>
+                <input 
+                  type="email" 
+                  required
+                  value={composeData.to}
+                  onChange={e => setComposeData({...composeData, to: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  placeholder="client@exemple.com"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sujet</label>
+                <input 
+                  type="text" 
+                  required
+                  value={composeData.subject}
+                  onChange={e => setComposeData({...composeData, subject: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  placeholder="Sujet de votre message"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Message</label>
+                <textarea 
+                  rows={12} 
+                  required
+                  value={composeData.body}
+                  onChange={e => setComposeData({...composeData, body: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm font-sans" 
+                  placeholder="Écrivez votre message ici..."
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <button 
+                  type="button"
+                  onClick={() => setView('inbox')}
+                  className="px-6 py-2 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-50"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  className="px-6 py-2 bg-petrol-dark text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  <Send size={16} /> Envoyer
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : view === 'sent' ? (
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800">Historique des envois</h3>
+              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">{sentEmails.length} messages</span>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {sentEmails.map((email) => (
+                <div key={email.id} className="p-6 hover:bg-slate-50 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className="font-bold text-slate-800">{email.subject}</h4>
+                      <p className="text-xs text-slate-500">À: {email.to}</p>
+                    </div>
+                    <span className="text-[10px] text-slate-400">
+                      {email.createdAt instanceof Timestamp ? email.createdAt.toDate().toLocaleString() : 'Récemment'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-600 line-clamp-2 whitespace-pre-wrap">{email.body}</p>
+                </div>
+              ))}
+              {sentEmails.length === 0 && (
+                <div className="p-12 text-center text-slate-400 italic text-sm">
+                  Aucun message envoyé.
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-1 overflow-hidden">
+            {/* List */}
+            <div className="w-1/2 border-r border-slate-100 overflow-y-auto">
+              <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                  <input 
+                    type="text" 
+                    placeholder="Rechercher un message..." 
+                    className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {messages.map((msg) => (
+                  <button 
+                    key={msg.id}
+                    onClick={() => setSelectedMessage(msg)}
+                    className={cn(
+                      "w-full p-4 text-left hover:bg-slate-50 transition-colors flex flex-col gap-1",
+                      selectedMessage?.id === msg.id ? "bg-slate-50 border-l-4 border-accent" : "border-l-4 border-transparent"
+                    )}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-slate-800 text-sm">{msg.name}</span>
+                      <span className="text-[10px] text-slate-400">
+                        {msg.createdAt instanceof Timestamp ? msg.createdAt.toDate().toLocaleDateString() : 'Récemment'}
+                      </span>
+                    </div>
+                    <span className="text-xs text-petrol font-medium truncate">{msg.email}</span>
+                    <p className="text-xs text-slate-500 line-clamp-1">{msg.message}</p>
+                  </button>
+                ))}
+                {messages.length === 0 && (
+                  <div className="p-12 text-center text-slate-400 italic text-sm">
+                    Aucun message reçu.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Detail */}
+            <div className="flex-1 bg-slate-50/30 overflow-y-auto">
+              {selectedMessage ? (
+                <div className="p-8">
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+                    <div className="flex justify-between items-start mb-8">
+                      <div>
+                        <h3 className="text-xl font-black text-petrol-dark">{selectedMessage.name}</h3>
+                        <p className="text-sm text-accent font-bold">{selectedMessage.email}</p>
+                        {selectedMessage.phone && <p className="text-xs text-slate-400 mt-1">{selectedMessage.phone}</p>}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Reçu le</p>
+                        <p className="text-xs font-bold text-slate-600">
+                          {selectedMessage.createdAt instanceof Timestamp ? selectedMessage.createdAt.toDate().toLocaleString() : 'Récemment'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-6 rounded-xl mb-8 border-l-4 border-slate-200">
+                      <p className="text-slate-700 whitespace-pre-wrap leading-relaxed">{selectedMessage.message}</p>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => {
+                          setComposeData({
+                            to: selectedMessage.email,
+                            subject: `Re: Demande de contact - EDCMIZ SARL`,
+                            body: `Bonjour ${selectedMessage.name},\n\nMerci pour votre message.\n\n`
+                          });
+                          setView('compose');
+                        }}
+                        className="px-6 py-2 bg-petrol-dark text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                      >
+                        <Mail size={16} /> Répondre
+                      </button>
+                      <button 
+                        onClick={generateDraft}
+                        disabled={isDrafting}
+                        className="px-6 py-2 border border-accent text-accent rounded-xl text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2 disabled:opacity-50"
+                      >
+                        {isDrafting ? <Loader2 size={16} className="animate-spin" /> : <BarChart3 size={16} />}
+                        Brouillon IA
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-slate-300 p-8 text-center">
+                  <Mail size={64} className="mb-4 opacity-20" />
+                  <p className="text-sm font-bold uppercase tracking-widest">Sélectionnez un message pour le lire</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

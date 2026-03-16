@@ -86,6 +86,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /content/site {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /equipment/{equipmentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Prospects (CRM) - Public can create, only admin can read/update
     match /prospects/{prospectId} {
       allow create: if hasOnlyAllowedFields(['name', 'email', 'phone', 'type', 'budget', 'message', 'status', 'createdAt']) &&
@@ -99,6 +109,11 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
       allow write: if isAdmin();
+    }
+
+    // Sent Emails History
+    match /sent_emails/{emailId} {
+      allow read, write: if isAdmin();
     }
   }
 }
