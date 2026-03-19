@@ -4,11 +4,13 @@ import {
   Plus, 
   Briefcase, 
   Settings, 
+  Users, 
   Trash2, 
   X, 
   Save,
-  Upload,
-  Users
+  Play,
+  ImageIcon,
+  Target
 } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
 import { db, OperationType, handleFirestoreError } from '../../lib/firebase';
@@ -28,7 +30,7 @@ import {
 import { cn } from '@/src/lib/utils';
 
 export function CMSView() {
-  const [activeSection, setActiveSection] = useState<'hero' | 'about' | 'why' | 'news' | 'testimonials'>('hero');
+  const [activeSection, setActiveSection] = useState<'hero' | 'about' | 'why' | 'news' | 'testimonials' | 'showcase' | 'team'>('hero');
   const [content, setContent] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -56,6 +58,35 @@ export function CMSView() {
     content: '',
     imageUrl: '',
     rating: 5
+  });
+
+  // Showcase Management States
+  const [showcaseItems, setShowcaseItems] = useState<any[]>([]);
+  const [showAddShowcaseModal, setShowAddShowcaseModal] = useState(false);
+  const [showEditShowcaseModal, setShowEditShowcaseModal] = useState(false);
+  const [editingShowcaseItem, setEditingShowcaseItem] = useState<any>(null);
+  const [newShowcaseItem, setNewShowcaseItem] = useState({
+    title: '',
+    type: 'image',
+    src: '',
+    thumbnail: '',
+    category: 'BTP',
+    location: '',
+    duration: '',
+    description: ''
+  });
+
+  // Team Management States
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+  const [showEditTeamModal, setShowEditTeamModal] = useState(false);
+  const [editingTeamMember, setEditingTeamMember] = useState<any>(null);
+  const [newTeamMember, setNewTeamMember] = useState({
+    name: '',
+    role: '',
+    photoUrl: '',
+    bio: '',
+    order: 0
   });
 
   useEffect(() => {
@@ -109,9 +140,29 @@ export function CMSView() {
       handleFirestoreError(error, OperationType.LIST, testimonialsPath);
     });
 
+    // Fetch Showcase
+    const showcasePath = 'showcase';
+    const qShowcase = query(collection(db, showcasePath), orderBy('createdAt', 'desc'));
+    const unsubscribeShowcase = onSnapshot(qShowcase, (snapshot) => {
+      setShowcaseItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, showcasePath);
+    });
+
+    // Fetch Team
+    const teamPath = 'team';
+    const qTeam = query(collection(db, teamPath), orderBy('order', 'asc'));
+    const unsubscribeTeam = onSnapshot(qTeam, (snapshot) => {
+      setTeamMembers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, teamPath);
+    });
+
     return () => {
       unsubscribeNews();
       unsubscribeTestimonials();
+      unsubscribeShowcase();
+      unsubscribeTeam();
     };
   }, []);
 
@@ -215,6 +266,109 @@ export function CMSView() {
     }
   };
 
+  const handleAddShowcase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'showcase'), {
+        ...newShowcaseItem,
+        createdAt: Timestamp.now()
+      });
+      setShowAddShowcaseModal(false);
+      setNewShowcaseItem({
+        title: '',
+        type: 'image',
+        src: '',
+        thumbnail: '',
+        category: 'BTP',
+        location: '',
+        duration: '',
+        description: ''
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'showcase');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditShowcase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingShowcaseItem) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'showcase', editingShowcaseItem.id), {
+        ...editingShowcaseItem,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditShowcaseModal(false);
+      setEditingShowcaseItem(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `showcase/${editingShowcaseItem.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteShowcaseItem = async (id: string) => {
+    if (!confirm('Supprimer cet élément de la vitrine ?')) return;
+    try {
+      await deleteDoc(doc(db, 'showcase', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `showcase/${id}`);
+    }
+  };
+
+  const handleAddTeamMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'team'), {
+        ...newTeamMember,
+        createdAt: Timestamp.now()
+      });
+      setShowAddTeamModal(false);
+      setNewTeamMember({
+        name: '',
+        role: '',
+        photoUrl: '',
+        bio: '',
+        order: teamMembers.length
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'team');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditTeamMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTeamMember) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'team', editingTeamMember.id), {
+        ...editingTeamMember,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditTeamModal(false);
+      setEditingTeamMember(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `team/${editingTeamMember.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteTeamMember = async (id: string) => {
+    if (!confirm('Supprimer ce membre de l\'équipe ?')) return;
+    try {
+      await deleteDoc(doc(db, 'team', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `team/${id}`);
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     const path = 'content/site';
@@ -232,31 +386,55 @@ export function CMSView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 border-b border-black/5 dark:border-white/5 pb-4 overflow-x-auto custom-scrollbar">
-        <button 
-          onClick={() => setActiveSection('hero')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'hero' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-        >
-          Hero
-        </button>
-        <button 
-          onClick={() => setActiveSection('about')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'about' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-        >
-          À Propos
-        </button>
-        <button 
-          onClick={() => setActiveSection('news')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-        >
-          Actualités
-        </button>
-        <button 
-          onClick={() => setActiveSection('testimonials')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'testimonials' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-        >
-          Témoignages
-        </button>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 dark:border-white/5 pb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
+            <img 
+              src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+              alt="EDCMIZ" 
+              className="w-full h-full object-contain"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div className="flex items-center gap-4 overflow-x-auto custom-scrollbar">
+            <button 
+              onClick={() => setActiveSection('hero')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'hero' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              Hero
+            </button>
+            <button 
+              onClick={() => setActiveSection('about')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'about' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              À Propos
+            </button>
+            <button 
+              onClick={() => setActiveSection('news')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              Actualités
+            </button>
+            <button 
+              onClick={() => setActiveSection('testimonials')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'testimonials' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              Témoignages
+            </button>
+            <button 
+              onClick={() => setActiveSection('showcase')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'showcase' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              Vitrine
+            </button>
+            <button 
+              onClick={() => setActiveSection('team')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'team' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              Équipe
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-white/5 p-8 border border-black/5 dark:border-white/5 rounded-2xl shadow-sm max-w-4xl">
@@ -460,6 +638,126 @@ export function CMSView() {
               ))}
               {testimonials.length === 0 && (
                 <p className="text-sm text-slate-500 italic py-8 text-center">Aucun témoignage enregistré.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'showcase' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h4 className="font-bold uppercase tracking-widest text-xs">Vitrine des Réalisations</h4>
+              <button 
+                onClick={() => setShowAddShowcaseModal(true)}
+                className="text-xs font-bold text-accent flex items-center gap-1 hover:underline"
+              >
+                <Plus size={14} /> Ajouter un projet
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {showcaseItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group">
+                  <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0 bg-black/10 dark:bg-white/10 relative">
+                    {item.type === 'video' ? (
+                      <>
+                        <img src={item.thumbnail || item.src} alt="" className="w-full h-full object-cover opacity-50" referrerPolicy="no-referrer" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Play size={20} className="text-white fill-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <img src={item.src} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-2 py-0.5 rounded">
+                        {item.category}
+                      </span>
+                      <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                        {item.type === 'video' ? <Play size={10} /> : <ImageIcon size={10} />}
+                        {item.type === 'video' ? 'Vidéo' : 'Image'}
+                      </span>
+                    </div>
+                    <h5 className="font-bold text-sm truncate">{item.title}</h5>
+                    <p className="text-[10px] text-slate-400 truncate">{item.location} • {item.duration}</p>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => {
+                        setEditingShowcaseItem(item);
+                        setShowEditShowcaseModal(true);
+                      }}
+                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                    >
+                      <Settings size={18} />
+                    </button>
+                    <button 
+                      onClick={() => deleteShowcaseItem(item.id)}
+                      className="p-2 text-slate-400 hover:text-red-500"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {showcaseItems.length === 0 && (
+                <p className="text-sm text-slate-500 italic py-8 text-center">Aucun projet dans la vitrine.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'team' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h4 className="font-bold uppercase tracking-widest text-xs">Équipe EDC MIZ</h4>
+              <button 
+                onClick={() => setShowAddTeamModal(true)}
+                className="text-xs font-bold text-accent flex items-center gap-1 hover:underline"
+              >
+                <Plus size={14} /> Ajouter un membre
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {teamMembers.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group">
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-black/10 dark:bg-white/10">
+                    {item.photoUrl ? (
+                      <img src={item.photoUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <Users size={20} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="font-bold text-sm">{item.name}</h5>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-accent">{item.role}</p>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => {
+                        setEditingTeamMember(item);
+                        setShowEditTeamModal(true);
+                      }}
+                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                    >
+                      <Settings size={18} />
+                    </button>
+                    <button 
+                      onClick={() => deleteTeamMember(item.id)}
+                      className="p-2 text-slate-400 hover:text-red-500"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {teamMembers.length === 0 && (
+                <p className="text-sm text-slate-500 italic py-8 text-center">Aucun membre d'équipe enregistré.</p>
               )}
             </div>
           </div>
@@ -797,6 +1095,388 @@ export function CMSView() {
                 <button 
                   type="button"
                   onClick={() => setShowEditTestimonialModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modals for Showcase */}
+      {showAddShowcaseModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Nouveau Projet</h4>
+              <button onClick={() => setShowAddShowcaseModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddShowcase} className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre du projet</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newShowcaseItem.title}
+                    onChange={e => setNewShowcaseItem({...newShowcaseItem, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Type</label>
+                    <select 
+                      value={newShowcaseItem.type}
+                      onChange={e => setNewShowcaseItem({...newShowcaseItem, type: e.target.value as 'image' | 'video'})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="image">Image</option>
+                      <option value="video">Vidéo</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={newShowcaseItem.category}
+                      onChange={e => setNewShowcaseItem({...newShowcaseItem, category: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Localisation</label>
+                    <input 
+                      type="text" 
+                      value={newShowcaseItem.location}
+                      onChange={e => setNewShowcaseItem({...newShowcaseItem, location: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Durée</label>
+                    <input 
+                      type="text" 
+                      value={newShowcaseItem.duration}
+                      onChange={e => setNewShowcaseItem({...newShowcaseItem, duration: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <ImageUpload 
+                  label={newShowcaseItem.type === 'video' ? "URL de la vidéo (ou upload)" : "Image du projet"}
+                  currentUrl={newShowcaseItem.src}
+                  onUpload={(url) => setNewShowcaseItem({...newShowcaseItem, src: url})}
+                  folder="showcase"
+                />
+                {newShowcaseItem.type === 'video' && (
+                  <ImageUpload 
+                    label="Miniature de la vidéo"
+                    currentUrl={newShowcaseItem.thumbnail}
+                    onUpload={(url) => setNewShowcaseItem({...newShowcaseItem, thumbnail: url})}
+                    folder="showcase/thumbnails"
+                  />
+                )}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    value={newShowcaseItem.description}
+                    onChange={e => setNewShowcaseItem({...newShowcaseItem, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddShowcaseModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditShowcaseModal && editingShowcaseItem && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Projet</h4>
+              <button onClick={() => setShowEditShowcaseModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleEditShowcase} className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre du projet</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editingShowcaseItem.title}
+                    onChange={e => setEditingShowcaseItem({...editingShowcaseItem, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Type</label>
+                    <select 
+                      value={editingShowcaseItem.type}
+                      onChange={e => setEditingShowcaseItem({...editingShowcaseItem, type: e.target.value as 'image' | 'video'})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                    >
+                      <option value="image">Image</option>
+                      <option value="video">Vidéo</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Catégorie</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingShowcaseItem.category}
+                      onChange={e => setEditingShowcaseItem({...editingShowcaseItem, category: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Localisation</label>
+                    <input 
+                      type="text" 
+                      value={editingShowcaseItem.location}
+                      onChange={e => setEditingShowcaseItem({...editingShowcaseItem, location: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Durée</label>
+                    <input 
+                      type="text" 
+                      value={editingShowcaseItem.duration}
+                      onChange={e => setEditingShowcaseItem({...editingShowcaseItem, duration: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <ImageUpload 
+                  label={editingShowcaseItem.type === 'video' ? "URL de la vidéo (ou upload)" : "Image du projet"}
+                  currentUrl={editingShowcaseItem.src}
+                  onUpload={(url) => setEditingShowcaseItem({...editingShowcaseItem, src: url})}
+                  folder="showcase"
+                />
+                {editingShowcaseItem.type === 'video' && (
+                  <ImageUpload 
+                    label="Miniature de la vidéo"
+                    currentUrl={editingShowcaseItem.thumbnail}
+                    onUpload={(url) => setEditingShowcaseItem({...editingShowcaseItem, thumbnail: url})}
+                    folder="showcase/thumbnails"
+                  />
+                )}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                  <textarea 
+                    rows={3}
+                    value={editingShowcaseItem.description}
+                    onChange={e => setEditingShowcaseItem({...editingShowcaseItem, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditShowcaseModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modals for Team */}
+      {showAddTeamModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Nouveau Membre</h4>
+              <button onClick={() => setShowAddTeamModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddTeamMember} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nom complet</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={newTeamMember.name}
+                      onChange={e => setNewTeamMember({...newTeamMember, name: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Poste / Rôle</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={newTeamMember.role}
+                      onChange={e => setNewTeamMember({...newTeamMember, role: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ordre d'affichage</label>
+                  <input 
+                    type="number" 
+                    value={newTeamMember.order}
+                    onChange={e => setNewTeamMember({...newTeamMember, order: parseInt(e.target.value)})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <ImageUpload 
+                  label="Photo de profil"
+                  currentUrl={newTeamMember.photoUrl}
+                  onUpload={(url) => setNewTeamMember({...newTeamMember, photoUrl: url})}
+                  folder="team"
+                />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Bio courte</label>
+                  <textarea 
+                    rows={3}
+                    value={newTeamMember.bio}
+                    onChange={e => setNewTeamMember({...newTeamMember, bio: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddTeamModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditTeamModal && editingTeamMember && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Membre</h4>
+              <button onClick={() => setShowEditTeamModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleEditTeamMember} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nom complet</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingTeamMember.name}
+                      onChange={e => setEditingTeamMember({...editingTeamMember, name: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Poste / Rôle</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingTeamMember.role}
+                      onChange={e => setEditingTeamMember({...editingTeamMember, role: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ordre d'affichage</label>
+                  <input 
+                    type="number" 
+                    value={editingTeamMember.order}
+                    onChange={e => setEditingTeamMember({...editingTeamMember, order: parseInt(e.target.value)})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+                <ImageUpload 
+                  label="Photo de profil"
+                  currentUrl={editingTeamMember.photoUrl}
+                  onUpload={(url) => setEditingTeamMember({...editingTeamMember, photoUrl: url})}
+                  folder="team"
+                />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Bio courte</label>
+                  <textarea 
+                    rows={3}
+                    value={editingTeamMember.bio}
+                    onChange={e => setEditingTeamMember({...editingTeamMember, bio: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditTeamModal(false)}
                   className="px-6 py-2 text-slate-500 font-bold text-sm"
                 >
                   Annuler

@@ -145,9 +145,19 @@ export function SettingsView() {
     <div className="max-w-6xl space-y-10 pb-32">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Paramètres</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Configurez l'identité visuelle, les contacts et le SEO de votre plateforme.</p>
+        <div className="flex items-center gap-6">
+          <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
+            <img 
+              src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+              alt="EDCMIZ" 
+              className="w-full h-full object-contain"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div>
+            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Paramètres</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Configurez l'identité visuelle, les contacts et le SEO de votre plateforme.</p>
+          </div>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
           <CheckCircle2 size={12} />

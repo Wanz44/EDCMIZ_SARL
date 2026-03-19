@@ -107,14 +107,14 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
       <div className="fixed inset-0 z-[100] bg-petrol-dark flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="p-8 text-petrol-dark text-center">
-             <div className="flex items-center justify-center mb-4">
-              <img 
-                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
-                alt="EDCMIZ Logo" 
-                className="h-48 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </div>
+              <div className="flex items-center justify-center mb-6">
+               <img 
+                 src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+                 alt="EDCMIZ Logo" 
+                 className="h-96 w-auto object-contain"
+                 referrerPolicy="no-referrer"
+               />
+             </div>
             <h1 className="text-2xl font-black uppercase tracking-tight">Portail Admin</h1>
             <p className="text-xs font-bold opacity-70 uppercase tracking-widest mt-1">Accès Sécurisé</p>
           </div>
@@ -202,11 +202,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
     )}>
       {/* Top Header - Minimal */}
       <header className={cn(
-        "h-24 flex items-center justify-between px-8 shrink-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
+        "h-48 flex items-center justify-between px-8 shrink-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
         theme === 'dark' ? "bg-black/20 border-white/5" : "bg-white/40 border-black/5"
       )}>
-        <div className="flex items-center gap-4">
-          <div className="w-20 h-20 flex items-center justify-center overflow-hidden">
+        <div className="flex items-center gap-6">
+          <div className="w-40 h-40 flex items-center justify-center overflow-hidden">
             <img 
               src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
               alt="EDCMIZ" 
@@ -294,11 +294,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
           <button
             onClick={() => setActiveTab('dashboard')}
             className={cn(
-              "p-3 rounded-2xl transition-all hover:scale-110 active:scale-90 group relative",
+              "p-4 rounded-2xl transition-all hover:scale-110 active:scale-90 group relative",
               theme === 'dark' ? "hover:bg-white/10" : "hover:bg-slate-100"
             )}
           >
-            <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
+            <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
               <img 
                 src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
                 alt="EDCMIZ" 

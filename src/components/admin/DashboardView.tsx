@@ -76,9 +76,19 @@ export function DashboardView() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-2xl font-black tracking-tight">Vue d'ensemble</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Statistiques en temps réel de votre activité.</p>
+        <div className="flex items-center gap-6">
+          <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
+            <img 
+              src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+              alt="EDCMIZ" 
+              className="w-full h-full object-contain"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div>
+            <h3 className="text-2xl font-black tracking-tight">Vue d'ensemble</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Statistiques en temps réel de votre activité.</p>
+          </div>
         </div>
         <button 
           onClick={resetStats}

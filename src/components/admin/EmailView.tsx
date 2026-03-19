@@ -111,9 +111,25 @@ export function EmailView() {
     <motion.div 
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex h-[calc(100vh-200px)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl"
+      className="flex flex-col h-[calc(100vh-200px)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl"
     >
-      {/* Email Sidebar */}
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-6 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
+          <img 
+            src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+            alt="EDCMIZ" 
+            className="w-full h-full object-contain"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <div>
+          <h3 className="text-xl font-black tracking-tight">Messagerie & IA</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-xs">Gérez vos communications et générez des réponses avec l'IA.</p>
+        </div>
+      </div>
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* Email Sidebar */}
       <div className="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="p-4">
           <button 
@@ -388,6 +404,7 @@ export function EmailView() {
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
-  );
+    </div>
+  </motion.div>
+);
 }
