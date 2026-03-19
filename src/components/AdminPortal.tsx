@@ -279,7 +279,10 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', damping: 20, stiffness: 100 }}
           className={cn(
-            "pointer-events-auto flex items-center gap-1 p-1.5 rounded-[1.5rem] transition-all duration-500 glass-mica ring-1 ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+            "pointer-events-auto flex items-center gap-1 p-1.5 rounded-[1.5rem] transition-all duration-500 backdrop-blur-2xl ring-1 shadow-2xl",
+            theme === 'dark' 
+              ? "bg-slate-900/90 ring-white/10 shadow-black/50" 
+              : "bg-white/90 ring-black/5 shadow-slate-200/50"
           )}
         >
           {/* "Start" Button */}
@@ -287,18 +290,24 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
             onClick={() => setActiveTab('dashboard')}
             className={cn(
               "p-3 rounded-2xl transition-all hover:scale-110 active:scale-90 group relative",
-              theme === 'dark' ? "hover:bg-white/10" : "hover:bg-black/5"
+              theme === 'dark' ? "hover:bg-white/10" : "hover:bg-slate-100"
             )}
           >
-            <div className="w-7 h-7 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-[11px] font-black text-petrol-dark shadow-lg shadow-accent/20">
+            <div className="w-7 h-7 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-[11px] font-black text-petrol-dark shadow-lg shadow-accent/30">
               E
             </div>
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl border border-white/10">
+            <div className={cn(
+              "absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl border",
+              theme === 'dark' ? "bg-slate-800 text-white border-white/10" : "bg-white text-slate-900 border-slate-200"
+            )}>
               Tableau de bord
             </div>
           </button>
 
-          <div className="w-px h-8 bg-slate-200 dark:bg-white/10 mx-1.5" />
+          <div className={cn(
+            "w-px h-8 mx-1.5",
+            theme === 'dark' ? "bg-white/10" : "bg-slate-200"
+          )} />
 
           <div className="flex items-center gap-1">
             {menuItems.map((item) => {
@@ -310,8 +319,8 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                   className={cn(
                     "relative group p-3 rounded-2xl transition-all duration-300 flex flex-col items-center gap-1",
                     isActive 
-                      ? "bg-accent/15 text-accent" 
-                      : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10"
+                      ? (theme === 'dark' ? "bg-accent/20 text-accent" : "bg-accent/10 text-accent")
+                      : (theme === 'dark' ? "text-slate-400 hover:bg-white/10 hover:text-white" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900")
                   )}
                 >
                   <item.icon 
@@ -331,7 +340,10 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
                   )}
 
                   {/* Tooltip */}
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap pointer-events-none shadow-xl border border-white/10">
+                  <div className={cn(
+                    "absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap pointer-events-none shadow-xl border",
+                    theme === 'dark' ? "bg-slate-800 text-white border-white/10" : "bg-white text-slate-900 border-slate-200"
+                  )}>
                     {item.label}
                   </div>
                 </button>
@@ -339,25 +351,32 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
             })}
           </div>
           
-          <div className="w-px h-8 bg-slate-200 dark:bg-white/10 mx-1.5" />
+          <div className={cn(
+            "w-px h-8 mx-1.5",
+            theme === 'dark' ? "bg-white/10" : "bg-slate-200"
+          )} />
           
           {/* System Tray Area */}
           <div className={cn(
             "flex items-center gap-2 px-4 py-2 rounded-2xl ml-1 transition-colors",
-            theme === 'dark' ? "bg-white/5 hover:bg-white/10" : "bg-black/5 hover:bg-black/10"
+            theme === 'dark' ? "bg-white/5 hover:bg-white/10 text-slate-300" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
           )}>
             <div className="flex flex-col items-end">
               <span className="text-[11px] font-black leading-none tracking-tight">
                 {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
-              <span className="text-[9px] opacity-50 font-bold leading-none mt-1">
+              <span className="text-[9px] opacity-60 font-bold leading-none mt-1">
                 {currentTime.toLocaleDateString([], { day: '2-digit', month: '2-digit' })}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-slate-400 border-l border-slate-200 dark:border-white/10 pl-2 ml-1">
+            <div className={cn(
+              "flex items-center gap-1.5 border-l pl-2 ml-1",
+              theme === 'dark' ? "border-white/10 text-slate-400" : "border-slate-300 text-slate-500"
+            )}>
               <button 
                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                 className="hover:text-accent transition-colors"
+                title={theme === 'light' ? "Passer au mode sombre" : "Passer au mode clair"}
               >
                 {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
               </button>
@@ -370,7 +389,10 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
 
           <button
             onClick={onClose}
-            className="p-3 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all ml-1 group relative"
+            className={cn(
+              "p-3 rounded-2xl transition-all ml-1 group relative",
+              theme === 'dark' ? "text-slate-400 hover:bg-red-500/20 hover:text-red-400" : "text-slate-500 hover:bg-red-500/10 hover:text-red-500"
+            )}
             title="Quitter"
           >
             <ArrowLeft size={22} className="group-hover:-translate-x-0.5 transition-transform" />
