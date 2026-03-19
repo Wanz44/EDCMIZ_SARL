@@ -107,11 +107,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
       <div className="fixed inset-0 z-[100] bg-petrol-dark flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="p-8 bg-accent text-petrol-dark text-center">
-             <div className="flex items-center">
+             <div className="flex items-center justify-center mb-4">
               <img 
-                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDCmiz_blanc.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FRENtaXpfYmxhbmMucG5nIiwiaWF0IjoxNzczMzMzMzYyLCJleHAiOjIwODg2OTMzNjJ9.-edbmzs_YuQcdnQ7H5KtzfoyPs3RGLwlTkp8AO78ers" 
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
                 alt="EDCMIZ Logo" 
-                className="h-32 w-auto object-contain"
+                className="h-24 w-auto object-contain"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -206,8 +206,13 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         theme === 'dark' ? "bg-black/20 border-white/5" : "bg-white/40 border-black/5"
       )}>
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-petrol-dark font-black shadow-lg shadow-accent/20">
-            E
+          <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shadow-lg shadow-accent/20 overflow-hidden p-1">
+            <img 
+              src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+              alt="EDCMIZ" 
+              className="w-full h-full object-contain"
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div>
             <h2 className="font-bold text-sm tracking-tight leading-none">Admin Portal</h2>
@@ -293,8 +298,13 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
               theme === 'dark' ? "hover:bg-white/10" : "hover:bg-slate-100"
             )}
           >
-            <div className="w-7 h-7 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-[11px] font-black text-petrol-dark shadow-lg shadow-accent/30">
-              E
+            <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center shadow-lg shadow-accent/30 overflow-hidden p-1">
+              <img 
+                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+                alt="EDCMIZ" 
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div className={cn(
               "absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl border",
