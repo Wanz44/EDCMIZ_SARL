@@ -106,12 +106,12 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
     return (
       <div className="fixed inset-0 z-[100] bg-petrol-dark flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-2xl overflow-hidden">
-          <div className="p-8 bg-accent text-petrol-dark text-center">
+          <div className="p-8 text-petrol-dark text-center">
              <div className="flex items-center justify-center mb-4">
               <img 
                 src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
                 alt="EDCMIZ Logo" 
-                className="h-24 w-auto object-contain"
+                className="h-48 w-auto object-contain"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -202,11 +202,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
     )}>
       {/* Top Header - Minimal */}
       <header className={cn(
-        "h-16 flex items-center justify-between px-8 shrink-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
+        "h-24 flex items-center justify-between px-8 shrink-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
         theme === 'dark' ? "bg-black/20 border-white/5" : "bg-white/40 border-black/5"
       )}>
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shadow-lg shadow-accent/20 overflow-hidden p-1">
+          <div className="w-20 h-20 flex items-center justify-center overflow-hidden">
             <img 
               src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
               alt="EDCMIZ" 
@@ -298,7 +298,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
               theme === 'dark' ? "hover:bg-white/10" : "hover:bg-slate-100"
             )}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center shadow-lg shadow-accent/30 overflow-hidden p-1">
+            <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
               <img 
                 src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
                 alt="EDCMIZ" 
