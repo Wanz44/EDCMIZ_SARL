@@ -232,37 +232,37 @@ export function CMSView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 border-b border-slate-200 pb-4">
+      <div className="flex items-center gap-4 border-b border-black/5 dark:border-white/5 pb-4 overflow-x-auto custom-scrollbar">
         <button 
           onClick={() => setActiveSection('hero')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'hero' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'hero' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
         >
           Hero
         </button>
         <button 
           onClick={() => setActiveSection('about')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'about' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'about' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
         >
           À Propos
         </button>
         <button 
           onClick={() => setActiveSection('news')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
         >
           Actualités
         </button>
         <button 
           onClick={() => setActiveSection('testimonials')}
-          className={cn("px-4 py-2 text-sm font-bold transition-all", activeSection === 'testimonials' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600")}
+          className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'testimonials' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
         >
           Témoignages
         </button>
       </div>
 
-      <div className="bg-white p-8 border border-slate-200 rounded-2xl shadow-sm max-w-4xl">
+      <div className="bg-white dark:bg-white/5 p-8 border border-black/5 dark:border-white/5 rounded-2xl shadow-sm max-w-4xl">
         {activeSection === 'hero' && (
           <div className="space-y-6">
-            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Section Hero</h4>
+            <h4 className="font-bold uppercase tracking-widest text-xs">Section Hero</h4>
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sous-titre (H2)</label>
@@ -270,7 +270,7 @@ export function CMSView() {
                   type="text" 
                   value={content.hero.subtitle}
                   onChange={e => setContent({...content, hero: {...content.hero, subtitle: e.target.value}})}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
                 />
               </div>
               <div className="space-y-2">
@@ -279,7 +279,7 @@ export function CMSView() {
                   type="text" 
                   value={content.hero.title}
                   onChange={e => setContent({...content, hero: {...content.hero, title: e.target.value}})}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
                 />
               </div>
               <div className="space-y-2">
@@ -288,7 +288,7 @@ export function CMSView() {
                   rows={3}
                   value={content.hero.description}
                   onChange={e => setContent({...content, hero: {...content.hero, description: e.target.value}})}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
                 />
               </div>
               <ImageUpload 
@@ -303,7 +303,7 @@ export function CMSView() {
 
         {activeSection === 'about' && (
           <div className="space-y-6">
-            <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Section À Propos</h4>
+            <h4 className="font-bold uppercase tracking-widest text-xs">Section À Propos</h4>
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre</label>
@@ -311,7 +311,7 @@ export function CMSView() {
                   type="text" 
                   value={content.about.title}
                   onChange={e => setContent({...content, about: {...content.about, title: e.target.value}})}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
                 />
               </div>
               <div className="space-y-2">
@@ -320,7 +320,7 @@ export function CMSView() {
                   rows={6}
                   value={content.about.description}
                   onChange={e => setContent({...content, about: {...content.about, description: e.target.value}})}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
                 />
               </div>
               <div className="grid grid-cols-2 gap-6">
@@ -330,7 +330,7 @@ export function CMSView() {
                     type="text" 
                     value={content.about.experienceYears}
                     onChange={e => setContent({...content, about: {...content.about, experienceYears: e.target.value}})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
                   />
                 </div>
                 <ImageUpload 
@@ -347,7 +347,7 @@ export function CMSView() {
         {activeSection === 'news' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Actualités & Blog</h4>
+              <h4 className="font-bold uppercase tracking-widest text-xs">Actualités & Blog</h4>
               <button 
                 onClick={() => setShowAddNewsModal(true)}
                 className="text-xs font-bold text-accent flex items-center gap-1 hover:underline"
@@ -358,8 +358,8 @@ export function CMSView() {
             
             <div className="grid grid-cols-1 gap-4">
               {news.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 group">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-200">
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-black/10 dark:bg-white/10">
                     {item.image ? (
                       <img src={item.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
@@ -375,7 +375,7 @@ export function CMSView() {
                       </span>
                       <span className="text-[10px] text-slate-400">{item.date}</span>
                     </div>
-                    <h5 className="font-bold text-slate-800 text-sm truncate">{item.title}</h5>
+                    <h5 className="font-bold text-sm truncate">{item.title}</h5>
                   </div>
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
@@ -383,7 +383,7 @@ export function CMSView() {
                         setEditingArticle(item);
                         setShowEditNewsModal(true);
                       }}
-                      className="p-2 text-slate-400 hover:text-slate-600"
+                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
                     >
                       <Settings size={18} />
                     </button>
@@ -406,7 +406,7 @@ export function CMSView() {
         {activeSection === 'testimonials' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Témoignages Clients</h4>
+              <h4 className="font-bold uppercase tracking-widest text-xs">Témoignages Clients</h4>
               <button 
                 onClick={() => setShowAddTestimonialModal(true)}
                 className="text-xs font-bold text-accent flex items-center gap-1 hover:underline"
@@ -417,8 +417,8 @@ export function CMSView() {
             
             <div className="grid grid-cols-1 gap-4">
               {testimonials.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 group">
-                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-slate-200">
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group">
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-black/10 dark:bg-white/10">
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
@@ -429,10 +429,10 @@ export function CMSView() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h5 className="font-bold text-slate-800 text-sm">{item.name}</h5>
+                      <h5 className="font-bold text-sm">{item.name}</h5>
                       <span className="text-[10px] text-slate-400">{item.role}</span>
                     </div>
-                    <p className="text-xs text-slate-600 line-clamp-1 italic">"{item.content}"</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 italic">"{item.content}"</p>
                     <div className="flex gap-0.5 mt-1">
                       {[...Array(5)].map((_, i) => (
                         <span key={i} className={cn("text-[10px]", i < item.rating ? "text-amber-400" : "text-slate-300")}>★</span>
@@ -445,7 +445,7 @@ export function CMSView() {
                         setEditingTestimonial(item);
                         setShowEditTestimonialModal(true);
                       }}
-                      className="p-2 text-slate-400 hover:text-slate-600"
+                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
                     >
                       <Settings size={18} />
                     </button>
@@ -466,14 +466,14 @@ export function CMSView() {
         )}
 
         {activeSection !== 'news' && activeSection !== 'testimonials' && (
-          <div className="mt-10 pt-6 border-t border-slate-100 flex justify-end">
+          <div className="mt-10 pt-6 border-t border-black/5 dark:border-white/5 flex justify-end">
             <button 
               onClick={handleSave}
               disabled={isSaving}
-              className="px-8 py-3 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+              className="px-8 py-3 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2 shadow-lg"
             >
               {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-              Enregistrer les modifications
+              Enregistrer
             </button>
           </div>
         )}

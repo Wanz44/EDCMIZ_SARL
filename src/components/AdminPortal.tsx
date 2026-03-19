@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, 
   Briefcase, 
@@ -6,15 +7,15 @@ import {
   FileText, 
   Settings, 
   LogOut, 
-  ChevronLeft,
-  Menu,
   Sun,
   Moon,
   Mail,
   ArrowLeft,
   Image as ImageIcon,
   Hammer,
-  Loader2
+  Loader2,
+  Clock,
+  Bell
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { auth } from '../lib/firebase';
@@ -47,13 +48,18 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('admin-theme') as 'light' | 'dark') || 'light';
     }
     return 'light';
   });
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('admin-theme', theme);
@@ -191,125 +197,189 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
 
   return (
     <div className={cn(
-      "fixed inset-0 z-[100] flex p-4 gap-4 overflow-hidden transition-colors duration-300",
-      theme === 'dark' ? "bg-slate-900" : "bg-slate-100"
+      "fixed inset-0 z-[100] flex flex-col overflow-hidden transition-colors duration-500",
+      theme === 'dark' ? "bg-[#0a0a0a] text-white" : "bg-[#f3f3f3] text-slate-900"
     )}>
-      {/* Sidebar - Floating Design */}
-      <aside className={cn(
-        "bg-petrol-dark text-white flex flex-col shrink-0 rounded-2xl shadow-2xl overflow-hidden border border-white/5 transition-all duration-300",
-        isSidebarCollapsed ? "w-20" : "w-64"
+      {/* Top Header - Minimal */}
+      <header className={cn(
+        "h-16 flex items-center justify-between px-8 shrink-0 z-20 backdrop-blur-xl border-b transition-all duration-300",
+        theme === 'dark' ? "bg-black/20 border-white/5" : "bg-white/40 border-black/5"
       )}>
-        <div className="p-6 border-b border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-petrol-dark font-black shadow-lg shrink-0">
-            EDC
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-petrol-dark font-black shadow-lg shadow-accent/20">
+            E
           </div>
-          {!isSidebarCollapsed && (
-            <div className="overflow-hidden whitespace-nowrap">
-              <h1 className="font-bold text-sm leading-tight">Admin Portal</h1>
-              <p className="text-[10px] text-white/50 uppercase tracking-widest">EDCMIZ SARL</p>
-            </div>
-          )}
+          <div>
+            <h2 className="font-bold text-sm tracking-tight leading-none">Admin Portal</h2>
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mt-1">EDCMIZ SARL</p>
+          </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id as Tab)}
-              title={isSidebarCollapsed ? item.label : undefined}
-              className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300",
-                activeTab === item.id 
-                  ? "bg-accent text-petrol-dark shadow-lg shadow-accent/20 translate-x-1" 
-                  : "text-white/70 hover:bg-white/5 hover:text-white hover:translate-x-1",
-                isSidebarCollapsed && "justify-center px-0"
-              )}
-            >
-              <item.icon size={18} />
-              {!isSidebarCollapsed && item.label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-white/10">
+        <div className="flex items-center gap-4">
           <button 
-            onClick={handleLogout}
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300",
-              isSidebarCollapsed && "justify-center px-0"
+              "p-2 rounded-xl transition-all hover:scale-110 active:scale-95",
+              theme === 'dark' ? "bg-white/5 text-yellow-400 hover:bg-white/10" : "bg-black/5 text-slate-500 hover:bg-black/10"
             )}
           >
-            <LogOut size={18} />
-            {!isSidebarCollapsed && "Déconnexion"}
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
-        </div>
-      </aside>
-
-      {/* Main Content Area - Floating Design */}
-      <main className={cn(
-        "flex-1 flex flex-col rounded-2xl shadow-xl overflow-hidden border transition-colors duration-300",
-        theme === 'dark' ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
-      )}>
-        <header className={cn(
-          "h-20 backdrop-blur-md border-b flex items-center justify-between px-8 shrink-0 z-10 transition-colors duration-300",
-          theme === 'dark' ? "bg-slate-800/80 border-slate-700" : "bg-white/80 border-slate-100"
-        )}>
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                theme === 'dark' ? "text-slate-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-100"
-              )}
-              title={isSidebarCollapsed ? "Développer le menu" : "Réduire le menu"}
-            >
-              {isSidebarCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
-            </button>
-            <button onClick={onClose} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h2 className={cn(
-                "font-black capitalize text-xl tracking-tight",
-                theme === 'dark' ? "text-white" : "text-petrol-dark"
-              )}>{activeTab.replace('-', ' ')}</h2>
-              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em]">Gestion du contenu</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                theme === 'dark' ? "text-yellow-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-100"
-              )}
-              title={theme === 'light' ? "Passer au mode sombre" : "Passer au mode clair"}
-            >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-            </button>
+          
+          <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-2" />
+          
+          <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className={cn(
-                "text-xs font-black",
-                theme === 'dark' ? "text-white" : "text-petrol-dark"
-              )}>{user.email}</p>
-              <p className="text-[10px] text-accent uppercase font-bold tracking-widest">Administrateur Principal</p>
+              <p className="text-xs font-bold">{user.email?.split('@')[0]}</p>
+              <p className="text-[9px] text-accent uppercase font-bold tracking-widest">Admin</p>
             </div>
-            <div className={cn(
-              "w-12 h-12 rounded-xl border flex items-center justify-center shadow-inner transition-colors",
-              theme === 'dark' ? "bg-slate-700 border-slate-600 text-accent" : "bg-slate-50 border-slate-200 text-petrol"
-            )}>
-              <Users size={24} />
-            </div>
+            <button 
+              onClick={handleLogout}
+              className={cn(
+                "p-2 rounded-xl transition-all hover:bg-red-500/10 hover:text-red-500",
+                theme === 'dark' ? "text-slate-400" : "text-slate-500"
+              )}
+              title="Déconnexion"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <div className={cn(
-          "flex-1 overflow-y-auto p-8 custom-scrollbar transition-colors duration-300",
-          theme === 'dark' ? "bg-slate-900/50" : "bg-slate-50/30"
-        )}>
-          {renderContent()}
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto relative custom-scrollbar pb-32">
+        <div className="max-w-7xl mx-auto p-6 md:p-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.98 }}
+              transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            >
+              <div className="mb-8">
+                <h1 className="text-3xl font-black tracking-tighter uppercase">
+                  {menuItems.find(item => item.id === activeTab)?.label}
+                </h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Gérez les informations et le contenu de votre plateforme.
+                </p>
+              </div>
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
+
+      {/* Bottom Taskbar - Windows 11 Style */}
+      <div className="fixed bottom-0 left-0 right-0 z-[110] p-4 flex justify-center pointer-events-none">
+        <motion.div 
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+          className={cn(
+            "pointer-events-auto flex items-center gap-1 p-1.5 rounded-[1.5rem] transition-all duration-500 glass-mica ring-1 ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+          )}
+        >
+          {/* "Start" Button */}
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={cn(
+              "p-3 rounded-2xl transition-all hover:scale-110 active:scale-90 group relative",
+              theme === 'dark' ? "hover:bg-white/10" : "hover:bg-black/5"
+            )}
+          >
+            <div className="w-7 h-7 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-[11px] font-black text-petrol-dark shadow-lg shadow-accent/20">
+              E
+            </div>
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl border border-white/10">
+              Tableau de bord
+            </div>
+          </button>
+
+          <div className="w-px h-8 bg-slate-200 dark:bg-white/10 mx-1.5" />
+
+          <div className="flex items-center gap-1">
+            {menuItems.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id as Tab)}
+                  className={cn(
+                    "relative group p-3 rounded-2xl transition-all duration-300 flex flex-col items-center gap-1",
+                    isActive 
+                      ? "bg-accent/15 text-accent" 
+                      : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10"
+                  )}
+                >
+                  <item.icon 
+                    size={22} 
+                    className={cn(
+                      "transition-all duration-300 group-hover:scale-110 group-active:scale-90",
+                      isActive ? "scale-110 drop-shadow-[0_0_8px_rgba(var(--accent-rgb),0.5)]" : "opacity-80 group-hover:opacity-100"
+                    )} 
+                  />
+                  
+                  {/* Active Indicator Dot */}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="active-dot"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1 bg-accent rounded-full shadow-[0_0_10px_rgba(var(--accent-rgb),0.8)]" 
+                    />
+                  )}
+
+                  {/* Tooltip */}
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap pointer-events-none shadow-xl border border-white/10">
+                    {item.label}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          
+          <div className="w-px h-8 bg-slate-200 dark:bg-white/10 mx-1.5" />
+          
+          {/* System Tray Area */}
+          <div className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-2xl ml-1 transition-colors",
+            theme === 'dark' ? "bg-white/5 hover:bg-white/10" : "bg-black/5 hover:bg-black/10"
+          )}>
+            <div className="flex flex-col items-end">
+              <span className="text-[11px] font-black leading-none tracking-tight">
+                {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+              <span className="text-[9px] opacity-50 font-bold leading-none mt-1">
+                {currentTime.toLocaleDateString([], { day: '2-digit', month: '2-digit' })}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-slate-400 border-l border-slate-200 dark:border-white/10 pl-2 ml-1">
+              <button 
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                className="hover:text-accent transition-colors"
+              >
+                {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+              </button>
+              <div className="relative group">
+                <Bell size={14} className="hover:text-accent transition-colors cursor-pointer" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="p-3 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all ml-1 group relative"
+            title="Quitter"
+          >
+            <ArrowLeft size={22} className="group-hover:-translate-x-0.5 transition-transform" />
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-red-600 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl">
+              Quitter le portail
+            </div>
+          </button>
+        </motion.div>
+      </div>
     </div>
   );
 }
