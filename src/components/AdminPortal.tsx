@@ -48,6 +48,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
@@ -76,10 +77,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
+    setLoginError(null);
     try {
       await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
     } catch (error) {
-      alert('Identifiants incorrects ou accès refusé.');
+      setLoginError('Identifiants incorrects ou accès refusé.');
       console.error(error);
     } finally {
       setIsLoggingIn(false);
@@ -117,6 +119,11 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
              </div>
             <h1 className="text-2xl font-black uppercase tracking-tight">Portail Admin</h1>
             <p className="text-xs font-bold opacity-70 uppercase tracking-widest mt-1">Accès Sécurisé</p>
+            {loginError && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-bold animate-shake">
+                {loginError}
+              </div>
+            )}
           </div>
           <form onSubmit={handleLogin} className="p-8 space-y-6">
             <div>
@@ -319,7 +326,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
             theme === 'dark' ? "bg-white/10" : "bg-slate-200"
           )} />
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-4">
             {menuItems.map((item) => {
               const isActive = activeTab === item.id;
               return (

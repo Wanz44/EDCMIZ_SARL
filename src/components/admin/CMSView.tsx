@@ -33,6 +33,7 @@ export function CMSView() {
   const [activeSection, setActiveSection] = useState<'hero' | 'about' | 'why' | 'news' | 'testimonials' | 'showcase' | 'team'>('hero');
   const [content, setContent] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // News Management States
   const [news, setNews] = useState<any[]>([]);
@@ -374,7 +375,8 @@ export function CMSView() {
     const path = 'content/site';
     try {
       await setDoc(doc(db, 'content', 'site'), content);
-      alert('Contenu mis à jour avec succès !');
+      setSuccessMessage('Contenu mis à jour avec succès !');
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, path);
     } finally {
@@ -764,7 +766,12 @@ export function CMSView() {
         )}
 
         {activeSection !== 'news' && activeSection !== 'testimonials' && (
-          <div className="mt-10 pt-6 border-t border-black/5 dark:border-white/5 flex justify-end">
+          <div className="mt-10 pt-6 border-t border-black/5 dark:border-white/5 flex flex-col items-end gap-4">
+            {successMessage && (
+              <div className="text-emerald-500 text-xs font-bold animate-pulse">
+                {successMessage}
+              </div>
+            )}
             <button 
               onClick={handleSave}
               disabled={isSaving}
