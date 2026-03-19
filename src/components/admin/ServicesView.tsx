@@ -8,6 +8,7 @@ import {
   X, 
   Save 
 } from 'lucide-react';
+import { ImageUpload } from './ImageUpload';
 import { db, OperationType, handleFirestoreError } from '../../lib/firebase';
 import { 
   collection, 
@@ -203,15 +204,12 @@ export function ServicesView() {
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image (Optionnel)</label>
-                  <input 
-                    type="text" 
-                    value={newService.image}
-                    onChange={e => setNewService({...newService, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image du Service (Optionnel)"
+                  currentUrl={newService.image}
+                  onUpload={(url) => setNewService({...newService, image: url})}
+                  folder="services"
+                />
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                 <button 
@@ -288,15 +286,12 @@ export function ServicesView() {
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image (Optionnel)</label>
-                  <input 
-                    type="text" 
-                    value={editingService.image}
-                    onChange={e => setEditingService({...editingService, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image du Service (Optionnel)"
+                  currentUrl={editingService.image}
+                  onUpload={(url) => setEditingService({...editingService, image: url})}
+                  folder="services"
+                />
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                 <button 

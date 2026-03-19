@@ -7,6 +7,7 @@ import {
   X, 
   Save 
 } from 'lucide-react';
+import { ImageUpload } from './ImageUpload';
 import { db, OperationType, handleFirestoreError } from '../../lib/firebase';
 import { 
   collection, 
@@ -212,14 +213,12 @@ export function PortfolioView() {
                     <option value="Digital">Digital & IT</option>
                   </select>
                 </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newProject.image}
-                    onChange={e => setNewProject({...newProject, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                <div className="md:col-span-2">
+                  <ImageUpload 
+                    label="Image du Projet"
+                    currentUrl={newProject.image}
+                    onUpload={(url) => setNewProject({...newProject, image: url})}
+                    folder="projects"
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
@@ -308,14 +307,12 @@ export function PortfolioView() {
                     <option value="Digital">Digital & IT</option>
                   </select>
                 </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={editingProject.image}
-                    onChange={e => setEditingProject({...editingProject, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                <div className="md:col-span-2">
+                  <ImageUpload 
+                    label="Image du Projet"
+                    currentUrl={editingProject.image}
+                    onUpload={(url) => setEditingProject({...editingProject, image: url})}
+                    folder="projects"
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">

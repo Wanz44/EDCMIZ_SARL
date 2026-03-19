@@ -8,6 +8,7 @@ import {
   X, 
   Save 
 } from 'lucide-react';
+import { ImageUpload } from './ImageUpload';
 import { db, OperationType, handleFirestoreError } from '../../lib/firebase';
 import { 
   collection, 
@@ -211,15 +212,12 @@ export function EquipmentView() {
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
-                  <input 
-                    type="text" 
-                    value={newEquip.imageUrl}
-                    onChange={e => setNewEquip({...newEquip, imageUrl: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image de l'équipement"
+                  currentUrl={newEquip.imageUrl}
+                  onUpload={(url) => setNewEquip({...newEquip, imageUrl: url})}
+                  folder="equipment"
+                />
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
                   <textarea 
@@ -300,15 +298,12 @@ export function EquipmentView() {
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
-                  <input 
-                    type="text" 
-                    value={editingEquip.imageUrl}
-                    onChange={e => setEditingEquip({...editingEquip, imageUrl: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image de l'équipement"
+                  currentUrl={editingEquip.imageUrl}
+                  onUpload={(url) => setEditingEquip({...editingEquip, imageUrl: url})}
+                  folder="equipment"
+                />
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
                   <textarea 

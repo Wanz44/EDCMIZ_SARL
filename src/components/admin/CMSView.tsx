@@ -7,8 +7,10 @@ import {
   Trash2, 
   X, 
   Save,
-  Upload
+  Upload,
+  Users
 } from 'lucide-react';
+import { ImageUpload } from './ImageUpload';
 import { db, OperationType, handleFirestoreError } from '../../lib/firebase';
 import { 
   collection, 
@@ -41,6 +43,19 @@ export function CMSView() {
     image: '',
     date: new Date().toISOString().split('T')[0],
     category: 'Actualité'
+  });
+
+  // Testimonials Management States
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [showAddTestimonialModal, setShowAddTestimonialModal] = useState(false);
+  const [showEditTestimonialModal, setShowEditTestimonialModal] = useState(false);
+  const [editingTestimonial, setEditingTestimonial] = useState<any>(null);
+  const [newTestimonial, setNewTestimonial] = useState({
+    name: '',
+    role: '',
+    content: '',
+    imageUrl: '',
+    rating: 5
   });
 
   useEffect(() => {
@@ -78,14 +93,26 @@ export function CMSView() {
 
     // Fetch News
     const newsPath = 'news';
-    const q = query(collection(db, newsPath), orderBy('date', 'desc'));
-    const unsubscribeNews = onSnapshot(q, (snapshot) => {
+    const qNews = query(collection(db, newsPath), orderBy('date', 'desc'));
+    const unsubscribeNews = onSnapshot(qNews, (snapshot) => {
       setNews(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, newsPath);
     });
 
-    return () => unsubscribeNews();
+    // Fetch Testimonials
+    const testimonialsPath = 'testimonials';
+    const qTestimonials = query(collection(db, testimonialsPath), orderBy('name', 'asc'));
+    const unsubscribeTestimonials = onSnapshot(qTestimonials, (snapshot) => {
+      setTestimonials(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, testimonialsPath);
+    });
+
+    return () => {
+      unsubscribeNews();
+      unsubscribeTestimonials();
+    };
   }, []);
 
   const handleAddNews = async (e: React.FormEvent) => {
@@ -135,6 +162,56 @@ export function CMSView() {
       await deleteDoc(doc(db, 'news', id));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `news/${id}`);
+    }
+  };
+
+  const handleAddTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, 'testimonials'), {
+        ...newTestimonial,
+        createdAt: Timestamp.now()
+      });
+      setShowAddTestimonialModal(false);
+      setNewTestimonial({
+        name: '',
+        role: '',
+        content: '',
+        imageUrl: '',
+        rating: 5
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'testimonials');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTestimonial) return;
+    setIsSaving(true);
+    try {
+      await updateDoc(doc(db, 'testimonials', editingTestimonial.id), {
+        ...editingTestimonial,
+        updatedAt: Timestamp.now()
+      });
+      setShowEditTestimonialModal(false);
+      setEditingTestimonial(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `testimonials/${editingTestimonial.id}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    if (!confirm('Supprimer ce témoignage ?')) return;
+    try {
+      await deleteDoc(doc(db, 'testimonials', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `testimonials/${id}`);
     }
   };
 
@@ -214,20 +291,12 @@ export function CMSView() {
                   className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Image de fond (URL)</label>
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    value={content.hero.imageUrl}
-                    onChange={e => setContent({...content, hero: {...content.hero, imageUrl: e.target.value}})}
-                    className="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                  <button className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200">
-                    <Upload size={18} />
-                  </button>
-                </div>
-              </div>
+              <ImageUpload 
+                label="Image de fond"
+                currentUrl={content.hero.imageUrl}
+                onUpload={(url) => setContent({...content, hero: {...content.hero, imageUrl: url}})}
+                folder="site/hero"
+              />
             </div>
           </div>
         )}
@@ -264,15 +333,12 @@ export function CMSView() {
                     className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Image (URL)</label>
-                  <input 
-                    type="text" 
-                    value={content.about.imageUrl}
-                    onChange={e => setContent({...content, about: {...content.about, imageUrl: e.target.value}})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image À Propos"
+                  currentUrl={content.about.imageUrl}
+                  onUpload={(url) => setContent({...content, about: {...content.about, imageUrl: url}})}
+                  folder="site/about"
+                />
               </div>
             </div>
           </div>
@@ -341,11 +407,61 @@ export function CMSView() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h4 className="font-bold text-slate-800 uppercase tracking-widest text-xs">Témoignages Clients</h4>
-              <button className="text-xs font-bold text-accent flex items-center gap-1 hover:underline">
+              <button 
+                onClick={() => setShowAddTestimonialModal(true)}
+                className="text-xs font-bold text-accent flex items-center gap-1 hover:underline"
+              >
                 <Plus size={14} /> Ajouter un avis
               </button>
             </div>
-            <p className="text-sm text-slate-500 italic">La gestion détaillée des témoignages sera disponible dans une mise à jour prochaine.</p>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {testimonials.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 group">
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-slate-200">
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <Users size={20} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h5 className="font-bold text-slate-800 text-sm">{item.name}</h5>
+                      <span className="text-[10px] text-slate-400">{item.role}</span>
+                    </div>
+                    <p className="text-xs text-slate-600 line-clamp-1 italic">"{item.content}"</p>
+                    <div className="flex gap-0.5 mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={cn("text-[10px]", i < item.rating ? "text-amber-400" : "text-slate-300")}>★</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => {
+                        setEditingTestimonial(item);
+                        setShowEditTestimonialModal(true);
+                      }}
+                      className="p-2 text-slate-400 hover:text-slate-600"
+                    >
+                      <Settings size={18} />
+                    </button>
+                    <button 
+                      onClick={() => deleteTestimonial(item.id)}
+                      className="p-2 text-slate-400 hover:text-red-500"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {testimonials.length === 0 && (
+                <p className="text-sm text-slate-500 italic py-8 text-center">Aucun témoignage enregistré.</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -407,15 +523,12 @@ export function CMSView() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
-                  <input 
-                    type="text" 
-                    value={newArticle.image}
-                    onChange={e => setNewArticle({...newArticle, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image de l'article"
+                  currentUrl={newArticle.image}
+                  onUpload={(url) => setNewArticle({...newArticle, image: url})}
+                  folder="news"
+                />
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Contenu de l'article</label>
                   <textarea 
@@ -492,15 +605,12 @@ export function CMSView() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">URL de l'image</label>
-                  <input 
-                    type="text" 
-                    value={editingArticle.image}
-                    onChange={e => setEditingArticle({...editingArticle, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
-                  />
-                </div>
+                <ImageUpload 
+                  label="Image de l'article"
+                  currentUrl={editingArticle.image}
+                  onUpload={(url) => setEditingArticle({...editingArticle, image: url})}
+                  folder="news"
+                />
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Contenu de l'article</label>
                   <textarea 
@@ -516,6 +626,177 @@ export function CMSView() {
                 <button 
                   type="button"
                   onClick={() => setShowEditNewsModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modals for Testimonials */}
+      {showAddTestimonialModal && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Nouveau Témoignage</h4>
+              <button onClick={() => setShowAddTestimonialModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddTestimonial} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nom du client</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={newTestimonial.name}
+                      onChange={e => setNewTestimonial({...newTestimonial, name: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Rôle / Entreprise</label>
+                    <input 
+                      type="text" 
+                      value={newTestimonial.role}
+                      onChange={e => setNewTestimonial({...newTestimonial, role: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Note (1-5)</label>
+                  <select 
+                    value={newTestimonial.rating}
+                    onChange={e => setNewTestimonial({...newTestimonial, rating: parseInt(e.target.value)})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                  >
+                    <option value="5">5 étoiles</option>
+                    <option value="4">4 étoiles</option>
+                    <option value="3">3 étoiles</option>
+                    <option value="2">2 étoiles</option>
+                    <option value="1">1 étoile</option>
+                  </select>
+                </div>
+                <ImageUpload 
+                  label="Image (Avatar)"
+                  currentUrl={newTestimonial.imageUrl}
+                  onUpload={(url) => setNewTestimonial({...newTestimonial, imageUrl: url})}
+                  folder="testimonials"
+                />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Témoignage</label>
+                  <textarea 
+                    rows={4}
+                    required
+                    value={newTestimonial.content}
+                    onChange={e => setNewTestimonial({...newTestimonial, content: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddTestimonialModal(false)}
+                  className="px-6 py-2 text-slate-500 font-bold text-sm"
+                >
+                  Annuler
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-8 py-2 bg-petrol-dark text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-accent hover:text-petrol-dark transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditTestimonialModal && editingTestimonial && (
+        <div className="fixed inset-0 z-[110] bg-petrol-dark/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-xl overflow-hidden">
+            <div className="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <h4 className="font-black text-petrol-dark uppercase tracking-tight">Modifier le Témoignage</h4>
+              <button onClick={() => setShowEditTestimonialModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleEditTestimonial} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nom du client</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editingTestimonial.name}
+                      onChange={e => setEditingTestimonial({...editingTestimonial, name: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Rôle / Entreprise</label>
+                    <input 
+                      type="text" 
+                      value={editingTestimonial.role}
+                      onChange={e => setEditingTestimonial({...editingTestimonial, role: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Note (1-5)</label>
+                  <select 
+                    value={editingTestimonial.rating}
+                    onChange={e => setEditingTestimonial({...editingTestimonial, rating: parseInt(e.target.value)})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm"
+                  >
+                    <option value="5">5 étoiles</option>
+                    <option value="4">4 étoiles</option>
+                    <option value="3">3 étoiles</option>
+                    <option value="2">2 étoiles</option>
+                    <option value="1">1 étoile</option>
+                  </select>
+                </div>
+                <ImageUpload 
+                  label="Image (Avatar)"
+                  currentUrl={editingTestimonial.imageUrl}
+                  onUpload={(url) => setEditingTestimonial({...editingTestimonial, imageUrl: url})}
+                  folder="testimonials"
+                />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Témoignage</label>
+                  <textarea 
+                    rows={4}
+                    required
+                    value={editingTestimonial.content}
+                    onChange={e => setEditingTestimonial({...editingTestimonial, content: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setShowEditTestimonialModal(false)}
                   className="px-6 py-2 text-slate-500 font-bold text-sm"
                 >
                   Annuler
