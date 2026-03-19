@@ -199,6 +199,37 @@
         "category": { "type": "string" }
       },
       "required": ["name", "imageUrl"]
+    },
+    "ShowcaseItem": {
+      "title": "ShowcaseItem",
+      "description": "An item in the project showcase (image or video)",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["image", "video"] },
+        "src": { "type": "string", "format": "uri" },
+        "thumbnail": { "type": "string", "format": "uri" },
+        "category": { "type": "string" },
+        "location": { "type": "string" },
+        "duration": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "type", "src"]
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "description": "A member of the company team",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "photoUrl": { "type": "string", "format": "uri" },
+        "bio": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "role"]
     }
   },
   "firestore": {
@@ -210,6 +241,8 @@
     "/settings/global": { "schema": "Settings", "description": "Global configuration" },
     "/content/site": { "schema": "SiteContent", "description": "Dynamic site content" },
     "/equipment/{equipmentId}": { "schema": "Equipment", "description": "Company equipment" },
+    "/showcase/{itemId}": { "schema": "ShowcaseItem", "description": "Project showcase items" },
+    "/team/{memberId}": { "schema": "TeamMember", "description": "Company team members" },
     "/users/{userId}": { "schema": "User", "description": "Admin users" },
     "/sent_emails/{emailId}": { "schema": "SentEmail", "description": "Sent emails history" }
   }

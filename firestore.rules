@@ -96,6 +96,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /showcase/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /team/{memberId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Prospects (CRM) - Public can create, only admin can read/update
     match /prospects/{prospectId} {
       allow create: if hasOnlyAllowedFields(['name', 'email', 'phone', 'type', 'budget', 'message', 'status', 'createdAt']) &&

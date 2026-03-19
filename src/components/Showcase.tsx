@@ -1,107 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, Image as ImageIcon, X, Maximize2, ChevronLeft, ChevronRight, MapPin, Clock, Info } from 'lucide-react';
-
-const galleryItems = [
-  {
-    id: 1,
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=1200',
-    thumbnail: 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=600',
-    title: 'Chantier Immeuble R+10',
-    category: 'BTP',
-    location: 'Kinshasa, Gombe',
-    duration: '18 mois',
-    description: 'Construction d\'un complexe résidentiel de haut standing incluant des parkings souterrains et une terrasse panoramique.'
-  },
-  {
-    id: 2,
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/preview/mixkit-construction-worker-on-a-building-site-441-large.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=600',
-    title: 'Surveillance de Chantier',
-    category: 'Surveillance',
-    location: 'Lubumbashi',
-    duration: 'Continu',
-    description: 'Mise en place d\'un système de surveillance par drone et caméras IP pour le suivi en temps réel de l\'avancement des travaux.'
-  },
-  {
-    id: 3,
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1200',
-    thumbnail: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=600',
-    title: 'Rénovation Industrielle',
-    category: 'Rénovation',
-    location: 'Matadi, Kongo Central',
-    duration: '6 mois',
-    description: 'Réhabilitation complète d\'un entrepôt portuaire avec renforcement des structures métalliques et nouveau dallage.'
-  },
-  {
-    id: 4,
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=1200',
-    thumbnail: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=600',
-    title: 'Voirie Gombe',
-    category: 'BTP',
-    location: 'Kinshasa, Gombe',
-    duration: '12 mois',
-    description: 'Aménagement des trottoirs et réfection de la chaussée avec pose de pavés autobloquants et éclairage public.'
-  },
-  {
-    id: 5,
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-working-on-a-computer-435-large.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600',
-    title: 'Solutions Digitales',
-    category: 'Digital',
-    location: 'Kinshasa',
-    duration: '4 mois',
-    description: 'Développement et déploiement d\'une infrastructure réseau sécurisée pour une institution publique.'
-  },
-  {
-    id: 6,
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=1200',
-    thumbnail: 'https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=600',
-    title: 'Études Techniques',
-    category: 'Ingénierie',
-    location: 'RDC (National)',
-    duration: 'Variable',
-    description: 'Réalisation d\'études de faisabilité et d\'impact environnemental pour divers projets d\'infrastructure.'
-  },
-  {
-    id: 7,
-    type: 'image',
-    src: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&q=80&w=1200',
-    thumbnail: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&q=80&w=600',
-    title: 'Ravalement de Façade',
-    category: 'Rénovation',
-    location: 'Kinshasa, Limete',
-    duration: '3 mois',
-    description: 'Nettoyage haute pression, réparation des fissures et mise en peinture d\'un immeuble commercial.'
-  },
-  {
-    id: 8,
-    type: 'video',
-    src: 'https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-city-with-skyscrapers-at-night-11-large.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=600',
-    title: 'Infrastructures Urbaines',
-    category: 'BTP',
-    location: 'Kinshasa',
-    duration: '24 mois',
-    description: 'Projet d\'envergure pour la modernisation des infrastructures de transport urbain.'
-  }
-];
-
-const categories = ['Tous', 'BTP', 'Digital', 'Rénovation', 'Surveillance'];
+import { Play, Image as ImageIcon, X, Maximize2, ChevronLeft, ChevronRight, MapPin, Clock, Info, Loader2 } from 'lucide-react';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 export default function Showcase() {
   const [filter, setFilter] = useState('Tous');
-  const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const path = 'showcase';
+    const q = query(collection(db, path), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setGalleryItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const categories = ['Tous', ...Array.from(new Set(galleryItems.map(item => item.category)))];
 
   const filteredItems = filter === 'Tous' 
     ? galleryItems 
-    : galleryItems.filter(item => item.category === filter || (filter === 'BTP' && ['Ingénierie', 'BTP'].includes(item.category)));
+    : galleryItems.filter(item => item.category === filter);
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -120,6 +46,14 @@ export default function Showcase() {
   };
 
   const currentMedia = galleryItems.find(item => item.id === selectedItem);
+
+  if (loading && galleryItems.length === 0) {
+    return (
+      <section id="showcase" className="py-24 bg-slate-50 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="text-accent animate-spin" size={48} />
+      </section>
+    );
+  }
 
   return (
     <section id="showcase" className="py-24 bg-slate-50 overflow-hidden">
@@ -175,7 +109,7 @@ export default function Showcase() {
                 onClick={() => setSelectedItem(item.id)}
               >
                 <img
-                  src={item.thumbnail}
+                  src={item.type === 'video' ? (item.thumbnail || item.src) : item.src}
                   alt={item.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                   referrerPolicy="no-referrer"
