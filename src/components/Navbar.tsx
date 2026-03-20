@@ -51,7 +51,7 @@ export default function Navbar({ onOpenPortal }: NavbarProps) {
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center space-x-1 xl:space-x-4">
+            <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
@@ -105,7 +105,7 @@ export default function Navbar({ onOpenPortal }: NavbarProps) {
               exit={{ opacity: 0, height: 0 }}
               className="lg:hidden bg-white border-t border-slate-100 overflow-hidden"
             >
-              <div className="px-4 py-8 grid grid-cols-2 gap-4">
+              <div className="px-4 py-8 grid grid-cols-2 gap-6">
                 {navLinks.map((link) => (
                   <a
                     key={link.name}

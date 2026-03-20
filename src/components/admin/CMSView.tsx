@@ -97,7 +97,27 @@ export function CMSView() {
         const docRef = doc(db, 'content', 'site');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setContent(docSnap.data());
+          const data = docSnap.data();
+          // Ensure 'why' exists
+          if (!data.why) {
+            data.why = {
+              title: "Pourquoi nous choisir ?",
+              subtitle: "Une Expertise Reconnue dans le BTP & l'Ingénierie",
+              description: "EDCMIZ sarl est une entreprise de construction de référence en RDC. Nous sommes des pionniers de l'ingénierie moderne, mettant notre savoir-faire au service de projets d'envergure avec une rigueur et une qualité inégalées.",
+              imageUrl: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/images_traveau.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9pbWFnZXNfdHJhdmVhdS5wbmciLCJpYXQiOjE3NzMzMzY5MDQsImV4cCI6MjA4ODY5NjkwNH0.w8sWBaxjN5at8k9OM1J0JHRTo4P44I55Y1QG6ZgVcWc",
+              reasons: [
+                { title: "Respect des Délais", description: "La ponctualité est au cœur de notre engagement. Nous mettons en œuvre une planification rigoureuse pour garantir la livraison de vos projets dans les temps convenus.", icon: "Clock" },
+                { title: "Expertise Technique Certifiée", description: "Nos équipes sont composées d'ingénieurs et de techniciens hautement qualifiés, assurant des constructions robustes conformes aux normes internationales.", icon: "Award" },
+                { title: "Optimisation des Budgets", description: "Nous maximisons l'efficacité de vos investissements en optimisant l'utilisation des matériaux et des ressources pour un rapport qualité-prix inégalé.", icon: "BarChart3" }
+              ],
+              stats: [
+                { label: "Coûts de matériaux", value: "-20%" },
+                { label: "Vitesse d'exécution", value: "+35%" },
+                { label: "Transparence", value: "100%" }
+              ]
+            };
+          }
+          setContent(data);
         } else {
           // Initial state if not exists
           setContent({
@@ -114,6 +134,22 @@ export function CMSView() {
               description: "EDCMIZ sarl est une entreprise leader en République Démocratique du Congo...",
               imageUrl: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/Architecture/ABC01.jpg",
               experienceYears: "6+"
+            },
+            why: {
+              title: "Pourquoi nous choisir ?",
+              subtitle: "Une Expertise Reconnue dans le BTP & l'Ingénierie",
+              description: "EDCMIZ sarl est une entreprise de construction de référence en RDC. Nous sommes des pionniers de l'ingénierie moderne, mettant notre savoir-faire au service de projets d'envergure avec une rigueur et une qualité inégalées.",
+              imageUrl: "https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/images_traveau.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9pbWFnZXNfdHJhdmVhdS5wbmciLCJpYXQiOjE3NzMzMzY5MDQsImV4cCI6MjA4ODY5NjkwNH0.w8sWBaxjN5at8k9OM1J0JHRTo4P44I55Y1QG6ZgVcWc",
+              reasons: [
+                { title: "Respect des Délais", description: "La ponctualité est au cœur de notre engagement. Nous mettons en œuvre une planification rigoureuse pour garantir la livraison de vos projets dans les temps convenus.", icon: "Clock" },
+                { title: "Expertise Technique Certifiée", description: "Nos équipes sont composées d'ingénieurs et de techniciens hautement qualifiés, assurant des constructions robustes conformes aux normes internationales.", icon: "Award" },
+                { title: "Optimisation des Budgets", description: "Nous maximisons l'efficacité de vos investissements en optimisant l'utilisation des matériaux et des ressources pour un rapport qualité-prix inégalé.", icon: "BarChart3" }
+              ],
+              stats: [
+                { label: "Coûts de matériaux", value: "-20%" },
+                { label: "Vitesse d'exécution", value: "+35%" },
+                { label: "Transparence", value: "100%" }
+              ]
             }
           });
         }
@@ -412,6 +448,12 @@ export function CMSView() {
               À Propos
             </button>
             <button 
+              onClick={() => setActiveSection('why')}
+              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'why' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
+            >
+              Pourquoi Nous ?
+            </button>
+            <button 
               onClick={() => setActiveSection('news')}
               className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
             >
@@ -519,6 +561,134 @@ export function CMSView() {
                   onUpload={(url) => setContent({...content, about: {...content.about, imageUrl: url}})}
                   folder="site/about"
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'why' && (
+          <div className="space-y-8">
+            <h4 className="font-bold uppercase tracking-widest text-xs">Section Pourquoi Nous Choisir ?</h4>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Petit Titre (Accent)</label>
+                <input 
+                  type="text" 
+                  value={content.why.title}
+                  onChange={e => setContent({...content, why: {...content.why, title: e.target.value}})}
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre Principal</label>
+                <input 
+                  type="text" 
+                  value={content.why.subtitle}
+                  onChange={e => setContent({...content, why: {...content.why, subtitle: e.target.value}})}
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</label>
+                <textarea 
+                  rows={4}
+                  value={content.why.description}
+                  onChange={e => setContent({...content, why: {...content.why, description: e.target.value}})}
+                  className="w-full px-4 py-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                />
+              </div>
+              <ImageUpload 
+                label="Image de la section"
+                currentUrl={content.why.imageUrl}
+                onUpload={(url) => setContent({...content, why: {...content.why, imageUrl: url}})}
+                folder="site/why"
+              />
+
+              <div className="space-y-4">
+                <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Raisons (3 maximum)</h5>
+                <div className="grid grid-cols-1 gap-4">
+                  {content.why.reasons.map((reason: any, idx: number) => (
+                    <div key={idx} className="p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Titre de la raison</label>
+                          <input 
+                            type="text" 
+                            value={reason.title}
+                            onChange={e => {
+                              const newReasons = [...content.why.reasons];
+                              newReasons[idx].title = e.target.value;
+                              setContent({...content, why: {...content.why, reasons: newReasons}});
+                            }}
+                            className="w-full px-4 py-2 bg-white dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Icône (Clock, Award, BarChart3)</label>
+                          <input 
+                            type="text" 
+                            value={reason.icon}
+                            onChange={e => {
+                              const newReasons = [...content.why.reasons];
+                              newReasons[idx].icon = e.target.value;
+                              setContent({...content, why: {...content.why, reasons: newReasons}});
+                            }}
+                            className="w-full px-4 py-2 bg-white dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description de la raison</label>
+                        <textarea 
+                          rows={2}
+                          value={reason.description}
+                          onChange={e => {
+                            const newReasons = [...content.why.reasons];
+                            newReasons[idx].description = e.target.value;
+                            setContent({...content, why: {...content.why, reasons: newReasons}});
+                          }}
+                          className="w-full px-4 py-2 bg-white dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statistiques (3 maximum)</h5>
+                <div className="grid grid-cols-3 gap-4">
+                  {content.why.stats.map((stat: any, idx: number) => (
+                    <div key={idx} className="p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Valeur</label>
+                        <input 
+                          type="text" 
+                          value={stat.value}
+                          onChange={e => {
+                            const newStats = [...content.why.stats];
+                            newStats[idx].value = e.target.value;
+                            setContent({...content, why: {...content.why, stats: newStats}});
+                          }}
+                          className="w-full px-4 py-2 bg-white dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Label</label>
+                        <input 
+                          type="text" 
+                          value={stat.label}
+                          onChange={e => {
+                            const newStats = [...content.why.stats];
+                            newStats[idx].label = e.target.value;
+                            setContent({...content, why: {...content.why, stats: newStats}});
+                          }}
+                          className="w-full px-4 py-2 bg-white dark:bg-black/20 border border-black/5 dark:border-white/5 rounded-xl text-sm focus:ring-2 focus:ring-accent/50 outline-none" 
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

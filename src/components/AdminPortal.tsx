@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { 
   LayoutDashboard, 
   Briefcase, 
@@ -36,6 +36,66 @@ import { EquipmentView } from './admin/EquipmentView';
 import { CMSView } from './admin/CMSView';
 import { SettingsView } from './admin/SettingsView';
 
+function DockIcon({ mouseX, onClick, isActive, label, theme, icon: Icon, isStart = false, isLogout = false }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const distance = useTransform(mouseX, (val: number) => {
+    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+    return val - bounds.x - bounds.width / 2;
+  });
+
+  const widthSync = useTransform(distance, [-150, 0, 150], [48, 80, 48]);
+  const width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 });
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ width }}
+      onClick={onClick}
+      className={cn(
+        "relative group aspect-square rounded-2xl transition-all duration-300 flex flex-col items-center justify-center cursor-pointer",
+        isActive 
+          ? (theme === 'dark' ? "bg-accent/20 text-accent" : "bg-accent/10 text-accent")
+          : (theme === 'dark' ? "text-slate-400 hover:bg-white/10 hover:text-white" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"),
+        isLogout && (theme === 'dark' ? "hover:bg-red-500/20 hover:text-red-400" : "hover:bg-red-500/10 hover:text-red-500")
+      )}
+    >
+      {isStart ? (
+        <div className="w-full h-full p-2 flex items-center justify-center overflow-hidden">
+          <img 
+            src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+            alt="EDCMIZ" 
+            className="w-full h-full object-contain"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      ) : (
+        <Icon 
+          size={22} 
+          className={cn(
+            "transition-all duration-300",
+            isActive ? "scale-110 drop-shadow-[0_0_8px_rgba(var(--accent-rgb),0.5)]" : "opacity-80 group-hover:opacity-100"
+          )} 
+        />
+      )}
+
+      {isActive && !isStart && !isLogout && (
+        <motion.div 
+          layoutId="active-dot"
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1 bg-accent rounded-full shadow-[0_0_10px_rgba(var(--accent-rgb),0.8)]" 
+        />
+      )}
+
+      <div className={cn(
+        "absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap pointer-events-none shadow-xl border",
+        isLogout ? "bg-red-600 text-white border-red-500" : (theme === 'dark' ? "bg-slate-800 text-white border-white/10" : "bg-white text-slate-900 border-slate-200")
+      )}>
+        {label}
+      </div>
+    </motion.div>
+  );
+}
+
 type Tab = 'dashboard' | 'portfolio' | 'services' | 'equipment' | 'crm' | 'emails' | 'cms' | 'settings';
 
 interface AdminPortalProps {
@@ -50,6 +110,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const mouseX = useMotionValue(Infinity);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('admin-theme') as 'light' | 'dark') || 'light';
@@ -284,98 +345,55 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         </div>
       </main>
 
-      {/* Bottom Taskbar - Windows 11 Style */}
+      {/* Bottom Taskbar - Modern iMac/macOS Dock Style */}
       <div className="fixed bottom-0 left-0 right-0 z-[110] p-4 flex justify-center pointer-events-none">
         <motion.div 
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+          onMouseMove={(e) => mouseX.set(e.pageX)}
+          onMouseLeave={() => mouseX.set(Infinity)}
           className={cn(
-            "pointer-events-auto flex items-center gap-1 p-1.5 rounded-[1.5rem] transition-all duration-500 backdrop-blur-2xl ring-1 shadow-2xl",
+            "pointer-events-auto flex items-end gap-2 p-2 pb-3 rounded-[2rem] transition-all duration-500 backdrop-blur-2xl ring-1 shadow-2xl",
             theme === 'dark' 
               ? "bg-slate-900/90 ring-white/10 shadow-black/50" 
               : "bg-white/90 ring-black/5 shadow-slate-200/50"
           )}
         >
-          {/* "Start" Button */}
-          <button
+          <DockIcon 
+            mouseX={mouseX}
             onClick={() => setActiveTab('dashboard')}
-            className={cn(
-              "p-4 rounded-2xl transition-all hover:scale-110 active:scale-90 group relative",
-              theme === 'dark' ? "hover:bg-white/10" : "hover:bg-slate-100"
-            )}
-          >
-            <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
-              <img 
-                src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
-                alt="EDCMIZ" 
-                className="w-full h-full object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className={cn(
-              "absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl border",
-              theme === 'dark' ? "bg-slate-800 text-white border-white/10" : "bg-white text-slate-900 border-slate-200"
-            )}>
-              Tableau de bord
-            </div>
-          </button>
+            isActive={activeTab === 'dashboard'}
+            label="Tableau de bord"
+            theme={theme}
+            isStart={true}
+          />
 
           <div className={cn(
-            "w-px h-8 mx-1.5",
+            "w-px h-8 mx-1 mb-2",
             theme === 'dark' ? "bg-white/10" : "bg-slate-200"
           )} />
 
-          <div className="flex items-center gap-4">
-            {menuItems.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id as Tab)}
-                  className={cn(
-                    "relative group p-3 rounded-2xl transition-all duration-300 flex flex-col items-center gap-1",
-                    isActive 
-                      ? (theme === 'dark' ? "bg-accent/20 text-accent" : "bg-accent/10 text-accent")
-                      : (theme === 'dark' ? "text-slate-400 hover:bg-white/10 hover:text-white" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900")
-                  )}
-                >
-                  <item.icon 
-                    size={22} 
-                    className={cn(
-                      "transition-all duration-300 group-hover:scale-110 group-active:scale-90",
-                      isActive ? "scale-110 drop-shadow-[0_0_8px_rgba(var(--accent-rgb),0.5)]" : "opacity-80 group-hover:opacity-100"
-                    )} 
-                  />
-                  
-                  {/* Active Indicator Dot */}
-                  {isActive && (
-                    <motion.div 
-                      layoutId="active-dot"
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1 bg-accent rounded-full shadow-[0_0_10px_rgba(var(--accent-rgb),0.8)]" 
-                    />
-                  )}
-
-                  {/* Tooltip */}
-                  <div className={cn(
-                    "absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap pointer-events-none shadow-xl border",
-                    theme === 'dark' ? "bg-slate-800 text-white border-white/10" : "bg-white text-slate-900 border-slate-200"
-                  )}>
-                    {item.label}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          {menuItems.map((item) => (
+            <DockIcon
+              key={item.id}
+              mouseX={mouseX}
+              onClick={() => setActiveTab(item.id as Tab)}
+              isActive={activeTab === item.id}
+              label={item.label}
+              theme={theme}
+              icon={item.icon}
+            />
+          ))}
           
           <div className={cn(
-            "w-px h-8 mx-1.5",
+            "w-px h-8 mx-1 mb-2",
             theme === 'dark' ? "bg-white/10" : "bg-slate-200"
           )} />
           
           {/* System Tray Area */}
           <div className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-2xl ml-1 transition-colors",
+            "flex items-center gap-2 px-4 py-2 rounded-2xl mb-1 transition-colors h-12 self-end",
             theme === 'dark' ? "bg-white/5 hover:bg-white/10 text-slate-300" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
           )}>
             <div className="flex flex-col items-end">
@@ -404,19 +422,14 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
             </div>
           </div>
 
-          <button
+          <DockIcon
+            mouseX={mouseX}
             onClick={onClose}
-            className={cn(
-              "p-3 rounded-2xl transition-all ml-1 group relative",
-              theme === 'dark' ? "text-slate-400 hover:bg-red-500/20 hover:text-red-400" : "text-slate-500 hover:bg-red-500/10 hover:text-red-500"
-            )}
-            title="Quitter"
-          >
-            <ArrowLeft size={22} className="group-hover:-translate-x-0.5 transition-transform" />
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-red-600 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 whitespace-nowrap shadow-xl">
-              Quitter le portail
-            </div>
-          </button>
+            label="Quitter le portail"
+            theme={theme}
+            icon={ArrowLeft}
+            isLogout={true}
+          />
         </motion.div>
       </div>
     </div>

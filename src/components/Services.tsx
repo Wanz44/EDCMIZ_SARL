@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { 
   Droplets, 
@@ -30,82 +30,34 @@ import {
   Settings,
   ShieldAlert
 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-const btpServices = [
-  {
-    title: "Adduction d'eau",
-    description: "Solutions complètes pour l'approvisionnement et la distribution d'eau potable.",
-    icon: Droplets,
-    image: "https://images.unsplash.com/photo-1542013936693-884638332954?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Infrastructures Routières",
-    description: "Construction et entretien de routes asphaltées et en terre battue.",
-    icon: Route,
-    image: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Construction Générale",
-    description: "Bâtiments résidentiels, commerciaux et industriels de haute qualité.",
-    icon: Building2,
-    image: "https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Agriculture",
-    description: "Aménagements hydro-agricoles et infrastructures pour le secteur rural.",
-    icon: Sprout,
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Rénovation",
-    description: "Modernisation et remise à neuf de vos bâtiments existants avec expertise.",
-    icon: Hammer,
-    image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Ravalement",
-    description: "Nettoyage, réparation et embellissement des façades pour une longévité accrue.",
-    icon: Paintbrush,
-    image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Études",
-    description: "Analyses techniques approfondies et conception de plans d'ingénierie précis.",
-    icon: ClipboardList,
-    image: "https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    title: "Surveillance des travaux",
-    description: "Contrôle rigoureux des chantiers pour garantir le respect des normes et délais.",
-    icon: HardHat,
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=800"
-  }
-];
-
-const digitalServices = [
-  {
-    title: "Cloud & Hosting",
-    icon: Cloud,
-    subIcons: [Server, Cpu, Cloud]
-  },
-  {
-    title: "Analyse de Données",
-    icon: Database,
-    subIcons: [BarChart3, PieChart, Search]
-  },
-  {
-    title: "Réseaux & Sécurité",
-    icon: Network,
-    subIcons: [ShieldCheck, Lock, Globe]
-  },
-  {
-    title: "Ingénierie Informatique",
-    icon: Code,
-    subIcons: [Monitor, Smartphone, Code]
-  }
-];
+const iconMap: Record<string, any> = {
+  Droplets, Route, Building2, Sprout, Cloud, Database, Network, Code,
+  Server, Cpu, BarChart3, PieChart, Search, ShieldCheck, Lock, Globe,
+  Smartphone, Monitor, Hammer, Paintbrush, ClipboardList, HardHat,
+  FileSearch, Layout, Settings, ShieldAlert
+};
 
 export default function Services() {
+  const [services, setServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'services'), orderBy('createdAt', 'desc'));
+    const unsub = onSnapshot(q, (snapshot) => {
+      const servicesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setServices(servicesData);
+    });
+    return () => unsub();
+  }, []);
+
+  const btpServices = services.filter(s => s.category === 'BTP');
+  const digitalServices = services.filter(s => s.category === 'Digital');
+
   return (
     <section id="services" className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,38 +76,41 @@ export default function Services() {
             <h4 className="text-2xl font-bold text-petrol-dark uppercase tracking-tight">Pôle BTP & Ingénierie</h4>
           </div>
           
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 [perspective:1000px]">
-            {btpServices.map((service, index) => (
-              <motion.div
-                key={service.title}
-                whileHover={{ 
-                  y: -10,
-                  rotateX: 5,
-                  rotateY: 5,
-                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
-                }}
-                className="bg-white rounded-sm shadow-xl overflow-hidden group border-b-4 border-transparent hover:border-accent transition-all service-card-decoration relative transform-gpu"
-              >
-                <div className="h-48 overflow-hidden relative">
-                  <img 
-                    src={service.image} 
-                    alt={service.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-petrol/20 group-hover:bg-transparent transition-colors" />
-                </div>
-                <div className="p-6">
-                  <div className="w-14 h-14 bg-petrol text-white polygon-clip flex items-center justify-center mb-4 group-hover:rotate-[360deg] transition-transform duration-700">
-                    <service.icon size={24} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 [perspective:1000px]">
+            {btpServices.map((service, index) => {
+              const IconComponent = iconMap[service.icon] || Building2;
+              return (
+                <motion.div
+                  key={service.id}
+                  whileHover={{ 
+                    y: -10,
+                    rotateX: 5,
+                    rotateY: 5,
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                  }}
+                  className="bg-white rounded-sm shadow-xl overflow-hidden group border-b-4 border-transparent hover:border-accent transition-all service-card-decoration relative transform-gpu"
+                >
+                  <div className="h-48 overflow-hidden relative">
+                    <img 
+                      src={service.image || "https://images.unsplash.com/photo-1503387762-592dee58c160?auto=format&fit=crop&q=80&w=800"} 
+                      alt={service.title} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-petrol/20 group-hover:bg-transparent transition-colors" />
                   </div>
-                  <h5 className="text-xl font-bold text-petrol-dark mb-2">{service.title}</h5>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    {service.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="p-6">
+                    <div className="w-14 h-14 bg-petrol text-white polygon-clip flex items-center justify-center mb-4 group-hover:rotate-[360deg] transition-transform duration-700">
+                      <IconComponent size={24} />
+                    </div>
+                    <h5 className="text-xl font-bold text-petrol-dark mb-2">{service.title}</h5>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      {service.description}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
@@ -172,43 +127,46 @@ export default function Services() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 [perspective:1000px]">
-              {digitalServices.map((service) => (
-                <motion.div 
-                  key={service.title} 
-                  whileHover={{ 
-                    y: -8,
-                    rotateX: -5,
-                    rotateY: 5,
-                    backgroundColor: "rgba(255, 255, 255, 0.12)",
-                    borderColor: "rgba(212, 161, 62, 0.4)"
-                  }}
-                  className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 transition-all rounded-sm service-card-decoration relative cursor-default group transform-gpu"
-                >
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="w-14 h-14 bg-accent text-petrol-dark polygon-clip flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <service.icon size={28} />
-                    </div>
-                    <h5 className="text-xl font-bold text-white leading-tight">{service.title}</h5>
-                  </div>
-                  
-                  <div className="flex gap-4 mb-8">
-                    {service.subIcons.map((SubIcon, idx) => (
-                      <div key={idx} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-accent/80 hover:bg-accent hover:text-petrol-dark transition-colors">
-                        <SubIcon size={20} />
+              {digitalServices.map((service) => {
+                const IconComponent = iconMap[service.icon] || Cloud;
+                return (
+                  <motion.div 
+                    key={service.id} 
+                    whileHover={{ 
+                      y: -8,
+                      rotateX: -5,
+                      rotateY: 5,
+                      backgroundColor: "rgba(255, 255, 255, 0.12)",
+                      borderColor: "rgba(212, 161, 62, 0.4)"
+                    }}
+                    className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 transition-all rounded-sm service-card-decoration relative cursor-default group transform-gpu"
+                  >
+                    <div className="flex items-center gap-4 mb-8">
+                      <div className="w-14 h-14 bg-accent text-petrol-dark polygon-clip flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <IconComponent size={28} />
                       </div>
-                    ))}
-                  </div>
+                      <h5 className="text-xl font-bold text-white leading-tight">{service.title}</h5>
+                    </div>
+                    
+                    <div className="flex gap-4 mb-8">
+                      {service.features?.slice(0, 3).map((feature: string, idx: number) => (
+                        <div key={idx} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-accent/80 hover:bg-accent hover:text-petrol-dark transition-colors">
+                          <CheckCircle2 size={20} />
+                        </div>
+                      ))}
+                    </div>
 
-                  <ul className="space-y-2">
-                    {['Performance', 'Sécurité', 'Innovation'].map((item) => (
-                      <li key={item} className="flex items-center text-xs text-accent/80">
-                        <CheckCircle2 size={14} className="mr-2" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
+                    <ul className="space-y-2">
+                      {service.features?.map((item: string) => (
+                        <li key={item} className="flex items-center text-xs text-accent/80">
+                          <CheckCircle2 size={14} className="mr-2" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </div>
