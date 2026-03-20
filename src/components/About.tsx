@@ -42,78 +42,98 @@ export default function About() {
   }
 
   return (
-    <section id="about" className="py-24 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section id="about" className="py-32 bg-slate-50 overflow-hidden relative">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-accent/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-petrol/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="relative z-10 rounded-sm overflow-hidden shadow-2xl">
+            <div className="relative z-10 rounded-3xl overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] aspect-[4/5]">
               <img 
                 src={content.imageUrl} 
                 alt="EDCMIZ Team" 
-                className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover transition-all duration-1000 hover:scale-110"
                 referrerPolicy="no-referrer"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-petrol-dark/60 to-transparent" />
             </div>
-            {/* Decorative elements */}
-            <div className="absolute -top-6 -left-6 w-32 h-32 bg-accent diamond-clip z-0" />
-            <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-petrol/10 diamond-clip z-0" />
             
-            <div className="absolute bottom-6 left-6 bg-white p-6 shadow-xl rounded-sm z-20 hidden sm:block">
-              <p className="text-petrol-dark font-black text-4xl">{content.experienceYears}</p>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Ans d'Expérience</p>
+            {/* Floating Experience Card */}
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="absolute -bottom-10 -right-10 bg-white p-10 shadow-2xl rounded-3xl z-20 hidden md:block border border-slate-100"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-accent/10 p-4 rounded-2xl text-accent">
+                  <Users size={32} />
+                </div>
+                <div>
+                  <p className="text-petrol-dark font-black text-5xl leading-none">{content.experienceYears}</p>
+                  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Ans d'Expertise</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Decorative Dots */}
+            <div className="absolute -top-10 -left-10 grid grid-cols-6 gap-2 opacity-20">
+              {[...Array(36)].map((_, i) => (
+                <div key={i} className="w-1.5 h-1.5 bg-petrol rounded-full" />
+              ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
           >
-            <h2 className="text-accent font-bold uppercase tracking-widest mb-2">À Propos de Nous</h2>
-            <h3 className="text-4xl font-black text-petrol-dark mb-6 leading-tight">
+            <div className="inline-block px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-6">
+              Notre Histoire
+            </div>
+            <h2 className="text-4xl sm:text-6xl font-black text-petrol-dark mb-8 leading-[1.1] tracking-tighter">
               {content.title}
-            </h3>
-            <p className="text-slate-600 text-lg mb-8 leading-relaxed">
+            </h2>
+            <p className="text-slate-500 text-lg sm:text-xl mb-12 leading-relaxed font-medium">
               {content.description}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-              <div className="flex items-center gap-4">
-                <div className="bg-petrol/5 p-3 rounded-sm text-petrol">
-                  <Shield size={24} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-16">
+              {[
+                { icon: Shield, title: "Qualité Certifiée", desc: "Normes internationales" },
+                { icon: Zap, title: "Exécution Rapide", desc: "Respect des délais" },
+                { icon: Users, title: "Équipe d'Experts", desc: "Ingénieurs qualifiés" },
+                { icon: Target, title: "Vision Moderne", desc: "Innovation continue" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-5 group">
+                  <div className="bg-white p-4 rounded-2xl text-petrol shadow-sm group-hover:bg-accent group-hover:text-petrol-dark transition-colors duration-300">
+                    <item.icon size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-petrol-dark uppercase text-xs tracking-widest mb-1">{item.title}</h4>
+                    <p className="text-slate-400 text-xs font-medium">{item.desc}</p>
+                  </div>
                 </div>
-                <span className="font-bold text-petrol-dark">Qualité Certifiée</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-petrol/5 p-3 rounded-sm text-petrol">
-                  <Zap size={24} />
-                </div>
-                <span className="font-bold text-petrol-dark">Exécution Rapide</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-petrol/5 p-3 rounded-sm text-petrol">
-                  <Users size={24} />
-                </div>
-                <span className="font-bold text-petrol-dark">Équipe d'Experts</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-petrol/5 p-3 rounded-sm text-petrol">
-                  <Target size={24} />
-                </div>
-                <span className="font-bold text-petrol-dark">Vision Moderne</span>
-              </div>
+              ))}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 pt-8 border-t border-slate-100">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-12 pt-12 border-t border-slate-200">
               {stats.map((stat) => (
-                <div key={stat.label}>
-                  <p className="text-2xl font-black text-petrol-dark">{stat.value}</p>
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{stat.label}</p>
+                <div key={stat.label} className="text-center sm:text-left">
+                  <p className="text-3xl font-black text-petrol-dark tracking-tighter">{stat.value}</p>
+                  <p className="text-[9px] text-slate-400 uppercase font-black tracking-[0.2em] mt-1">{stat.label}</p>
                 </div>
               ))}
             </div>

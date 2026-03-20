@@ -27,73 +27,104 @@ export default function WhyChooseUs() {
   if (!content) return null;
 
   return (
-    <section className="py-24 bg-slate-50 relative overflow-hidden">
-      {/* Polygonal background element */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-petrol/5 polygon-clip -z-10" />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section className="py-32 bg-petrol-dark relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-accent/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-petrol/20 rounded-full blur-[120px]" />
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
           >
-            <h2 className="text-accent font-bold uppercase tracking-widest mb-2">{content.title}</h2>
-            <h3 className="text-4xl font-black text-petrol-dark mb-6">{content.subtitle}</h3>
-            <p className="text-slate-600 text-lg mb-8 leading-relaxed">
+            <div className="inline-block px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-8">
+              {content.title}
+            </div>
+            <h2 className="text-4xl sm:text-7xl font-black text-white mb-10 leading-[1.1] tracking-tighter">
+              {content.subtitle}
+            </h2>
+            <p className="text-white/60 text-lg sm:text-xl mb-16 leading-relaxed font-medium max-w-xl">
               {content.description}
             </p>
-            
-            <div className="space-y-6 mb-10">
+
+            <div className="space-y-8">
               {content.reasons.map((reason: any, index: number) => {
                 const IconComponent = iconMap[reason.icon] || CheckCircle2;
                 return (
-                  <motion.div 
+                  <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.2 }}
-                    className="flex items-start p-4 bg-white rounded-sm shadow-sm border-l-4 border-accent"
+                    transition={{ delay: index * 0.1 }}
+                    className="group flex items-start gap-8 p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/10 hover:border-accent/30 transition-all duration-500"
                   >
-                    <div className="bg-petrol/10 p-3 rounded-sm mr-4 text-petrol">
-                      <IconComponent size={24} />
+                    <div className="w-16 h-16 bg-accent text-petrol-dark rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl">
+                      <IconComponent size={32} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-petrol-dark mb-1">{reason.title}</h4>
-                      <p className="text-sm text-slate-500">{reason.description}</p>
+                      <h4 className="text-2xl font-black text-white mb-3 tracking-tight group-hover:text-accent transition-colors">{reason.title}</h4>
+                      <p className="text-white/50 leading-relaxed font-medium group-hover:text-white/70 transition-colors">{reason.description}</p>
                     </div>
                   </motion.div>
                 );
               })}
             </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200">
+            <div className="grid grid-cols-3 gap-12 pt-16 border-t border-white/10 mt-16">
               {content.stats.map((stat: any, index: number) => (
-                <div key={index}>
-                  <p className="text-2xl font-black text-accent">{stat.value}</p>
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{stat.label}</p>
+                <div key={index} className="text-center sm:text-left">
+                  <p className="text-4xl font-black text-accent tracking-tighter">{stat.value}</p>
+                  <p className="text-[9px] text-white/40 uppercase font-black tracking-[0.2em] mt-2">{stat.label}</p>
                 </div>
               ))}
             </div>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 1 }}
             className="relative"
           >
-            <div className="relative z-10 rounded-sm overflow-hidden shadow-2xl">
+            <div className="relative z-10 rounded-[3rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] aspect-[4/5]">
               <img 
                 src={content.imageUrl} 
-                alt="Travaux de construction EDCMIZ"
-                className="w-full h-auto"
+                alt="Travaux de construction EDCMIZ" 
+                className="w-full h-full object-cover transition-transform duration-1000 hover:scale-110"
                 referrerPolicy="no-referrer"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-petrol-dark via-transparent to-transparent opacity-60" />
             </div>
-            {/* Decorative diamond */}
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent diamond-clip -z-10 opacity-50" />
+
+            {/* Floating Achievement Card */}
+            <motion.div
+              initial={{ x: 20, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="absolute -bottom-12 -left-12 bg-accent p-10 rounded-[2.5rem] shadow-2xl z-20 hidden md:block"
+            >
+              <div className="flex items-center gap-6">
+                <div className="bg-petrol-dark/10 p-4 rounded-2xl text-petrol-dark">
+                  <Award size={40} />
+                </div>
+                <div>
+                  <p className="text-petrol-dark font-black text-5xl leading-none">100%</p>
+                  <p className="text-petrol-dark/60 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Engagement Qualité</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Decorative Elements */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute top-1/2 -right-12 w-24 h-24 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl rotate-12 z-0" />
           </motion.div>
         </div>
       </div>

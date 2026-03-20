@@ -30,52 +30,68 @@ export default function Team() {
   }
 
   return (
-    <section id="team" className="py-24 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-petrol font-bold uppercase tracking-widest mb-2">Notre Équipe</h2>
-          <h3 className="text-4xl font-black text-petrol-dark">Les Experts d'EDCMIZ SARL</h3>
-          <div className="w-24 h-1.5 bg-accent mx-auto mt-6" />
-          <p className="text-slate-500 mt-6 max-w-2xl mx-auto">
+    <section id="team" className="py-32 bg-white overflow-hidden relative">
+      {/* Subtle Decorative Elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-50/50 -skew-x-12 transform origin-top-right -z-10" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-24">
+          <div className="inline-block px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-8">
+            Notre Équipe
+          </div>
+          <h2 className="text-5xl sm:text-7xl font-black text-petrol-dark leading-[1] tracking-tighter mb-8">
+            Les Experts d'<span className="text-accent">EDCMIZ</span> SARL
+          </h2>
+          <p className="text-slate-500 text-xl font-medium leading-relaxed max-w-3xl mx-auto">
             Une équipe pluridisciplinaire dévouée à la réussite de vos projets, 
             alliant expertise technique et engagement professionnel.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
           {teamMembers.map((member, index) => (
             <motion.div
               key={member.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.1, duration: 0.6, ease: "easeOut" }}
               className="group"
             >
-              <div className="relative mb-6 aspect-[4/5] overflow-hidden rounded-sm bg-slate-100">
+              <div className="relative mb-10 aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-100 shadow-2xl">
                 <img
                   src={member.photoUrl || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400'}
                   alt={member.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                  className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-petrol-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                  <a href="#" className="w-10 h-10 bg-accent text-petrol-dark rounded-full flex items-center justify-center hover:bg-white transition-colors">
-                    <Linkedin size={18} />
-                  </a>
-                  <a href="#" className="w-10 h-10 bg-accent text-petrol-dark rounded-full flex items-center justify-center hover:bg-white transition-colors">
-                    <Twitter size={18} />
-                  </a>
-                  <a href={`mailto:${member.email || 'info@edcmiz.com'}`} className="w-10 h-10 bg-accent text-petrol-dark rounded-full flex items-center justify-center hover:bg-white transition-colors">
-                    <Mail size={18} />
-                  </a>
+                
+                {/* Social Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-dark via-petrol-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
+                  <div className="flex items-center gap-4 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+                    <a href="#" className="w-12 h-12 bg-accent text-petrol-dark rounded-2xl flex items-center justify-center hover:bg-white hover:scale-110 active:scale-90 transition-all shadow-xl">
+                      <Linkedin size={20} />
+                    </a>
+                    <a href="#" className="w-12 h-12 bg-accent text-petrol-dark rounded-2xl flex items-center justify-center hover:bg-white hover:scale-110 active:scale-90 transition-all shadow-xl">
+                      <Twitter size={20} />
+                    </a>
+                    <a href={`mailto:${member.email || 'info@edcmiz.com'}`} className="w-12 h-12 bg-accent text-petrol-dark rounded-2xl flex items-center justify-center hover:bg-white hover:scale-110 active:scale-90 transition-all shadow-xl">
+                      <Mail size={20} />
+                    </a>
+                  </div>
                 </div>
               </div>
               
-              <div className="text-center">
-                <h4 className="text-xl font-black text-petrol-dark mb-1">{member.name}</h4>
-                <p className="text-accent text-xs font-bold uppercase tracking-widest mb-3">{member.role}</p>
-                <p className="text-slate-500 text-sm line-clamp-3 px-4">{member.bio}</p>
+              <div className="text-center px-4">
+                <h4 className="text-2xl font-black text-petrol-dark mb-2 tracking-tight group-hover:text-accent transition-colors duration-300">
+                  {member.name}
+                </h4>
+                <div className="inline-block px-3 py-1 bg-slate-50 text-accent text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4">
+                  {member.role}
+                </div>
+                <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-3 opacity-80 group-hover:opacity-100 transition-opacity">
+                  {member.bio}
+                </p>
               </div>
             </motion.div>
           ))}

@@ -25,42 +25,78 @@ const equipment = [
 
 export default function Equipment() {
   return (
-    <section className="py-24 bg-petrol-dark text-white overflow-hidden relative">
-      {/* Polygonal overlay */}
-      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-white/5 polygon-clip -z-10" />
+    <section className="py-32 bg-petrol-dark text-white overflow-hidden relative">
+      {/* Technical Background Grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-10">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-petrol-dark via-transparent to-petrol-dark" />
+      </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-accent font-bold uppercase tracking-widest mb-2">Nos Moyens Logistiques</h2>
-          <h3 className="text-4xl font-black">Équipements & Technologie</h3>
-          <p className="text-white/60 mt-4 max-w-2xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-24">
+          <div className="inline-block px-4 py-1.5 bg-accent/20 text-accent text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-8">
+            Nos Moyens Logistiques
+          </div>
+          <h2 className="text-5xl sm:text-7xl font-black leading-[1] tracking-tighter mb-8">
+            Équipements & <span className="text-accent">Technologie</span>
+          </h2>
+          <p className="text-white/50 text-xl font-medium leading-relaxed max-w-3xl mx-auto">
             Nous investissons massivement dans notre propre matériel pour garantir une autonomie totale et une réactivité maximale sur tous nos chantiers.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
           {equipment.map((group, gIndex) => (
-            <div key={group.category}>
-              <h4 className="text-xl font-bold text-accent mb-8 flex items-center">
-                <span className="w-8 h-1 bg-accent mr-4" />
-                {group.category}
-              </h4>
-              <div className="space-y-6">
+            <div key={group.category} className="space-y-12">
+              <div className="flex items-center gap-6">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent to-accent/30" />
+                <h4 className="text-[10px] font-black text-accent uppercase tracking-[0.4em] whitespace-nowrap">
+                  {group.category}
+                </h4>
+                <div className="h-px flex-1 bg-gradient-to-l from-transparent to-accent/30" />
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6">
                 {group.items.map((item, iIndex) => (
                   <motion.div
                     key={item.name}
-                    initial={{ opacity: 0, x: gIndex === 0 ? -20 : 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: iIndex * 0.1 }}
-                    className="flex items-center p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-sm hover:bg-white/10 transition-all group"
+                    transition={{ delay: iIndex * 0.1, duration: 0.5 }}
+                    className="group relative p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] hover:bg-white/10 transition-all duration-500 overflow-hidden"
                   >
-                    <div className="w-12 h-12 bg-accent text-petrol-dark polygon-clip flex items-center justify-center mr-6 group-hover:scale-110 transition-transform">
-                      <item.icon size={24} />
+                    {/* Hover Glow */}
+                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-accent/10 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    <div className="flex items-start relative z-10">
+                      <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-petrol-dark mr-8 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-2xl">
+                        <item.icon size={32} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-black text-xl tracking-tight group-hover:text-accent transition-colors duration-300">
+                            {item.name}
+                          </h5>
+                          <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                            0{iIndex + 1}
+                          </div>
+                        </div>
+                        <p className="text-base text-white/40 font-medium leading-relaxed">
+                          {item.detail}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h5 className="font-bold text-lg mb-1">{item.name}</h5>
-                      <p className="text-sm text-white/50">{item.detail}</p>
+                    
+                    {/* Bottom Status Bar */}
+                    <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Opérationnel</span>
+                      </div>
+                      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 group-hover:text-accent transition-colors">
+                        Détails Techniques
+                      </div>
                     </div>
                   </motion.div>
                 ))}

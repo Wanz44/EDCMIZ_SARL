@@ -10,7 +10,8 @@ import {
   Save,
   Play,
   ImageIcon,
-  Target
+  Target,
+  Calendar
 } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
 import { db, OperationType, handleFirestoreError } from '../../lib/firebase';
@@ -424,9 +425,9 @@ export function CMSView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 dark:border-white/5 pb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="flex items-center gap-6">
+          <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-4 flex items-center justify-center border border-slate-100 dark:border-slate-700">
             <img 
               src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
               alt="EDCMIZ" 
@@ -434,54 +435,40 @@ export function CMSView() {
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="flex items-center gap-4 overflow-x-auto custom-scrollbar">
-            <button 
-              onClick={() => setActiveSection('hero')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'hero' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              Hero
-            </button>
-            <button 
-              onClick={() => setActiveSection('about')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'about' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              À Propos
-            </button>
-            <button 
-              onClick={() => setActiveSection('why')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'why' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              Pourquoi Nous ?
-            </button>
-            <button 
-              onClick={() => setActiveSection('news')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'news' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              Actualités
-            </button>
-            <button 
-              onClick={() => setActiveSection('testimonials')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'testimonials' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              Témoignages
-            </button>
-            <button 
-              onClick={() => setActiveSection('showcase')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'showcase' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              Vitrine
-            </button>
-            <button 
-              onClick={() => setActiveSection('team')}
-              className={cn("px-4 py-2 text-sm font-bold transition-all whitespace-nowrap", activeSection === 'team' ? "text-accent border-b-2 border-accent" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200")}
-            >
-              Équipe
-            </button>
+          <div>
+            <h3 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Gestion du Contenu</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Personnalisez les textes et images de votre site</p>
           </div>
+        </div>
+        
+        <div className="flex gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
+          {[
+            { id: 'hero', label: 'Hero', icon: Play },
+            { id: 'about', label: 'À Propos', icon: Briefcase },
+            { id: 'why', label: 'Pourquoi ?', icon: Target },
+            { id: 'news', label: 'Actualités', icon: Briefcase },
+            { id: 'testimonials', label: 'Avis', icon: Users },
+            { id: 'showcase', label: 'Vitrine', icon: ImageIcon },
+            { id: 'team', label: 'Équipe', icon: Users }
+          ].map((section) => (
+            <button 
+              key={section.id}
+              onClick={() => setActiveSection(section.id as any)}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                activeSection === section.id 
+                  ? "bg-accent text-petrol-dark shadow-lg shadow-accent/20" 
+                  : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              )}
+            >
+              <section.icon size={14} />
+              {section.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="bg-white dark:bg-white/5 p-8 border border-black/5 dark:border-white/5 rounded-2xl shadow-sm max-w-4xl">
+      <div className="bg-white dark:bg-slate-900 p-10 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-sm max-w-5xl mx-auto">
         {activeSection === 'hero' && (
           <div className="space-y-6">
             <h4 className="font-bold uppercase tracking-widest text-xs">Section Hero</h4>
@@ -708,46 +695,54 @@ export function CMSView() {
             
             <div className="grid grid-cols-1 gap-4">
               {news.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 group">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-black/10 dark:bg-white/10">
+                <div key={item.id} className="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-700 group hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm hover:shadow-xl hover:shadow-accent/5">
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-slate-200 dark:bg-slate-700 shadow-inner">
                     {item.image ? (
-                      <img src={item.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={item.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" referrerPolicy="no-referrer" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-400">
-                        <Briefcase size={20} />
+                        <Briefcase size={24} />
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-2 py-0.5 rounded">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-accent bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
                         {item.category}
                       </span>
-                      <span className="text-[10px] text-slate-400">{item.date}</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                        <Calendar size={12} /> {item.date}
+                      </span>
                     </div>
-                    <h5 className="font-bold text-sm truncate">{item.title}</h5>
+                    <h5 className="font-black text-lg text-slate-800 dark:text-white truncate tracking-tight">{item.title}</h5>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-1 font-medium">{item.content}</p>
                   </div>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                     <button 
                       onClick={() => {
                         setEditingArticle(item);
                         setShowEditNewsModal(true);
                       }}
-                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                      className="p-3 text-slate-400 hover:text-accent hover:bg-accent/10 rounded-xl transition-all border border-transparent hover:border-accent/20"
                     >
-                      <Settings size={18} />
+                      <Settings size={20} />
                     </button>
                     <button 
                       onClick={() => deleteNews(item.id)}
-                      className="p-2 text-slate-400 hover:text-red-500"
+                      className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={20} />
                     </button>
                   </div>
                 </div>
               ))}
               {news.length === 0 && (
-                <p className="text-sm text-slate-500 italic py-8 text-center">Aucun article publié pour le moment.</p>
+                <div className="py-20 text-center">
+                  <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Briefcase size={32} className="text-slate-300 dark:text-slate-700" />
+                  </div>
+                  <p className="text-sm font-black uppercase tracking-widest text-slate-400">Aucun article publié</p>
+                </div>
               )}
             </div>
           </div>

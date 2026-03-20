@@ -82,47 +82,41 @@ export default function News() {
   }
 
   return (
-    <section id="news" className="py-24 bg-slate-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-          <div>
-            <h2 className="text-accent font-bold uppercase tracking-widest mb-2">Actualités</h2>
-            <h3 className="text-4xl font-black text-petrol-dark">Dernières Nouvelles</h3>
+    <section id="news" className="py-32 bg-slate-50 overflow-hidden relative">
+      {/* Decorative Background */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-petrol/10 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <div className="max-w-2xl">
+            <div className="inline-block px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-6">
+              Actualités
+            </div>
+            <h2 className="text-4xl sm:text-6xl font-black text-petrol-dark leading-[1.1] tracking-tighter">
+              Dernières <span className="text-accent">Nouvelles</span> du Terrain
+            </h2>
           </div>
-        </div>
-
-        <div className="relative h-[600px] md:h-[450px] group/carousel">
-          {/* Navigation Arrows Overlay */}
-          <button 
-            onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center text-petrol hover:bg-accent hover:text-petrol-dark transition-all opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-4 hidden md:flex"
-          >
-            <ChevronLeft size={28} />
-          </button>
-          <button 
-            onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-20 w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center text-petrol hover:bg-accent hover:text-petrol-dark transition-all opacity-0 group-hover/carousel:opacity-100 group-hover/carousel:-translate-x-4 hidden md:flex"
-          >
-            <ChevronRight size={28} />
-          </button>
-
-          {/* Mobile Navigation Arrows */}
-          <div className="absolute -bottom-16 left-0 right-0 flex justify-between md:hidden px-4">
-             <button 
+          <div className="flex gap-4">
+            <button 
               onClick={prevSlide}
-              className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-petrol"
+              className="w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center text-petrol hover:bg-accent hover:text-petrol-dark transition-all duration-300 active:scale-90"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={28} />
             </button>
             <button 
               onClick={nextSlide}
-              className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-petrol"
+              className="w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center text-petrol hover:bg-accent hover:text-petrol-dark transition-all duration-300 active:scale-90"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={28} />
             </button>
           </div>
+        </div>
 
-          <AnimatePresence initial={false} custom={direction}>
+        <div className="relative h-[700px] md:h-[550px]">
+          <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
               key={currentIndex}
               custom={direction}
@@ -132,35 +126,37 @@ export default function News() {
               exit="exit"
               transition={{
                 x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 }
+                opacity: { duration: 0.4 }
               }}
-              className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-sm shadow-2xl overflow-hidden"
+              className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-0 bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-100"
             >
-              <div className="h-64 md:h-full relative overflow-hidden">
+              <div className="h-64 md:h-full relative overflow-hidden group">
                 <img 
                   src={news[currentIndex].imageUrl} 
                   alt={news[currentIndex].title} 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute top-6 left-6 bg-accent text-petrol-dark px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-sm shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-dark/60 to-transparent" />
+                <div className="absolute top-8 left-8 bg-accent text-petrol-dark px-6 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-xl">
                   {news[currentIndex].category}
                 </div>
               </div>
-              <div className="p-8 md:p-12 flex flex-col justify-center">
-                <div className="flex items-center text-slate-400 text-sm mb-6">
-                  <Calendar size={18} className="mr-2" />
+              <div className="p-10 md:p-20 flex flex-col justify-center">
+                <div className="flex items-center text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-8">
+                  <Calendar size={16} className="mr-3 text-accent" />
                   {new Date(news[currentIndex].date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </div>
-                <h4 className="text-2xl md:text-3xl font-black text-petrol-dark mb-6 leading-tight">
+                <h4 className="text-3xl md:text-5xl font-black text-petrol-dark mb-8 leading-[1.1] tracking-tighter">
                   {news[currentIndex].title}
                 </h4>
-                <p className="text-slate-600 text-lg mb-10 leading-relaxed">
+                <p className="text-slate-500 text-lg mb-12 leading-relaxed font-medium line-clamp-3">
                   {news[currentIndex].excerpt}
                 </p>
                 <div className="mt-auto">
-                  <button className="bg-petrol text-white px-8 py-4 rounded-sm font-bold text-sm uppercase tracking-widest flex items-center hover:bg-accent hover:text-petrol-dark transition-all group">
-                    Lire l'article complet <ArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" size={18} />
+                  <button className="bg-petrol-dark text-white px-10 py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center hover:bg-accent hover:text-petrol-dark transition-all duration-300 group shadow-xl active:scale-95">
+                    Lire l'article complet 
+                    <ArrowRight className="ml-4 group-hover:translate-x-2 transition-transform duration-300" size={18} />
                   </button>
                 </div>
               </div>
@@ -168,7 +164,7 @@ export default function News() {
           </AnimatePresence>
         </div>
 
-        <div className="flex justify-center mt-12 gap-3">
+        <div className="flex justify-center mt-16 gap-4">
           {news.map((_, index) => (
             <button
               key={index}
@@ -176,8 +172,8 @@ export default function News() {
                 setDirection(index > currentIndex ? 1 : -1);
                 setCurrentIndex(index);
               }}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentIndex ? 'bg-accent w-8' : 'bg-petrol/20'
+              className={`h-2 rounded-full transition-all duration-500 ${
+                index === currentIndex ? 'bg-accent w-12' : 'bg-petrol/20 w-4 hover:bg-petrol/40'
               }`}
             />
           ))}

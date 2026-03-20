@@ -39,61 +39,82 @@ export default function Testimonials() {
   }
 
   return (
-    <section id="testimonials" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-accent font-bold uppercase tracking-widest mb-2">Ils nous font confiance</h2>
-          <h3 className="text-4xl font-black text-petrol-dark">Témoignages & Partenaires</h3>
-          <div className="w-24 h-1.5 bg-accent mx-auto mt-6" />
+    <section id="testimonials" className="py-32 bg-white relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
+        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-petrol/10 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-24">
+          <div className="inline-block px-4 py-1.5 bg-accent/10 text-accent text-[10px] font-black uppercase tracking-[0.3em] rounded-full mb-6">
+            Témoignages
+          </div>
+          <h3 className="text-4xl sm:text-6xl font-black text-petrol-dark tracking-tighter">Ils nous font <span className="text-accent">confiance</span></h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-32">
           {testimonials.map((t, index) => (
             <motion.div
               key={t.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2 }}
-              className="bg-slate-50 p-8 rounded-sm relative group hover:bg-petrol-dark transition-all duration-500"
+              className="group relative bg-slate-50 p-12 rounded-[2.5rem] hover:bg-petrol-dark transition-all duration-700 shadow-[0_20px_50px_rgba(0,0,0,0.03)] hover:shadow-[0_40px_80px_rgba(0,0,0,0.2)]"
             >
-              <Quote className="absolute top-6 right-6 text-petrol/10 group-hover:text-accent/20" size={48} />
+              <div className="absolute top-10 right-10 text-accent/20 group-hover:text-accent/40 transition-colors duration-500">
+                <Quote size={48} />
+              </div>
               
-              <div className="flex gap-1 mb-4">
+              <div className="flex gap-1 mb-8">
                 {[...Array(t.rating || 5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-accent text-accent" />
+                  <Star key={i} size={16} className="fill-accent text-accent" />
                 ))}
               </div>
 
-              <p className="text-slate-600 italic mb-6 leading-relaxed relative z-10 group-hover:text-white/80 transition-colors">
+              <p className="text-slate-500 text-lg italic mb-10 leading-relaxed group-hover:text-white/80 transition-colors duration-500">
                 "{t.content || t.text}"
               </p>
-              <div className="flex items-center gap-4">
+
+              <div className="flex items-center gap-5 pt-8 border-t border-slate-200 group-hover:border-white/10 transition-colors duration-500">
                 {t.imageUrl && (
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg group-hover:scale-110 transition-transform duration-500">
                     <img src={t.imageUrl} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
                 )}
                 <div>
-                   <h4 className="font-bold text-petrol-dark group-hover:text-white transition-colors">— {t.name}</h4>
-                   {t.role && <p className="text-xs text-slate-400 group-hover:text-accent transition-colors">{t.role}</p>}
+                   <h4 className="font-black text-petrol-dark group-hover:text-white transition-colors duration-500">— {t.name}</h4>
+                   {t.role && <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-accent transition-colors duration-500 mt-1">{t.role}</p>}
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="border-t border-slate-100 pt-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-50 grayscale hover:grayscale-0 transition-all">
-            {partners.map((p) => (
-              <div key={p.name} className="flex justify-center">
+        <div className="pt-24 border-t border-slate-100">
+          <div className="text-center mb-16">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Nos Partenaires Stratégiques</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-16 items-center">
+            {partners.map((p, i) => (
+              <motion.div 
+                key={p.name} 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 0.4 }}
+                whileHover={{ opacity: 1, scale: 1.1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="flex justify-center grayscale hover:grayscale-0 transition-all duration-500 cursor-pointer"
+              >
                 <img 
                   src={p.logo} 
                   alt={p.name} 
-                  className="h-24 object-contain"
+                  className="h-20 object-contain"
                   referrerPolicy="no-referrer"
                 />
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

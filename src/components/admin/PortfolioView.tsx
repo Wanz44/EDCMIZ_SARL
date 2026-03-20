@@ -113,84 +113,91 @@ export function PortfolioView() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div className="flex items-center gap-6 mb-8">
-        <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
-          <img 
-            src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
-            alt="EDCMIZ" 
-            className="w-full h-full object-contain"
-            referrerPolicy="no-referrer"
-          />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="flex items-center gap-6">
+          <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-4 flex items-center justify-center border border-slate-100 dark:border-slate-700">
+            <img 
+              src="https://efzybrnlapxwxkorddtv.supabase.co/storage/v1/object/sign/EDCMIZ_SARL/EDC-LOGO%20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80MTdmZmQ5ZS1jYWE3LTRmY2MtYTgzNS1mYzgwZGE1YWY0ZjgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJFRENNSVpfU0FSTC9FREMtTE9HTyAucG5nIiwiaWF0IjoxNzczMzMxNzE1LCJleHAiOjIwODg2OTE3MTV9.aG4aw3zsLEJkR-StBowbh7hfSA9nR0_lSP4LijFcyns" 
+              alt="EDCMIZ" 
+              className="w-full h-full object-contain"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div>
+            <h3 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Réalisations</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Gérez votre portfolio de projets et études de cas</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-2xl font-black text-slate-800 dark:text-white">Réalisations</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Gérez votre portfolio de projets</p>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div />
         <button 
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-accent text-petrol-dark rounded-xl text-sm font-black uppercase tracking-widest hover:bg-accent/90 shadow-lg shadow-accent/20 transition-all active:scale-95"
+          className="flex items-center gap-3 px-8 py-4 bg-accent text-petrol-dark rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-accent/90 shadow-xl shadow-accent/20 transition-all active:scale-95 whitespace-nowrap"
         >
-          <Plus size={18} /> Nouveau Projet
+          <Plus size={20} /> Nouveau Projet
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence mode="popLayout">
           {projects.map((project) => (
             <motion.div 
               key={project.id}
               layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm group hover:shadow-xl transition-all duration-500"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] overflow-hidden shadow-sm group hover:shadow-2xl transition-all duration-500"
             >
-              <div className="h-56 relative overflow-hidden">
+              <div className="h-64 relative overflow-hidden">
                 <img 
                   src={project.image || 'https://picsum.photos/seed/construction/800/600'} 
                   alt={project.title} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute top-4 right-4 glass-mica px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white">
-                  {project.status}
+                <div className="absolute inset-0 bg-gradient-to-t from-petrol-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="absolute top-6 left-6">
+                  <span className="px-4 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-petrol-dark dark:text-accent shadow-lg border border-white/20">
+                    {project.category}
+                  </span>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                  <div className="flex gap-2">
+
+                <div className="absolute top-6 right-6">
+                  <div className={cn(
+                    "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg border border-white/20 backdrop-blur-md",
+                    project.status === 'Terminé' ? "bg-emerald-500/90 text-white" : "bg-accent/90 text-petrol-dark"
+                  )}>
+                    {project.status}
+                  </div>
+                </div>
+
+                <div className="absolute bottom-6 left-6 right-6 translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out">
+                  <div className="flex gap-3">
                     <button 
                       onClick={() => {
                         setEditingProject(project);
                         setShowEditModal(true);
                       }}
-                      className="flex-1 py-2 bg-white text-petrol-dark rounded-lg text-xs font-bold hover:bg-accent transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 py-3 bg-white text-petrol-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent transition-all flex items-center justify-center gap-2 shadow-xl"
                     >
                       <Edit2 size={14} /> Modifier
                     </button>
                     <button 
                       onClick={() => deleteProject(project.id)}
-                      className="p-2 bg-white/20 hover:bg-red-500 text-white rounded-lg backdrop-blur-md transition-colors"
+                      className="p-3 bg-red-500/90 hover:bg-red-600 text-white rounded-xl backdrop-blur-md transition-all shadow-xl"
                     >
                       <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
               </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-2 py-0.5 rounded">
-                    {project.category}
-                  </span>
+              <div className="p-8">
+                <h4 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-3 group-hover:text-accent transition-colors tracking-tight leading-tight">{project.title}</h4>
+                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-4">
+                  <MapPin size={14} className="text-accent" />
+                  <span className="text-xs font-bold uppercase tracking-widest">{project.location}</span>
                 </div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-accent transition-colors">{project.title}</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                  <MapPin size={12} /> {project.location}
-                </p>
                 {project.description && (
-                  <p className="mt-3 text-xs text-slate-400 dark:text-slate-500 line-clamp-2 leading-relaxed italic">
+                  <p className="text-sm text-slate-400 dark:text-slate-500 line-clamp-2 leading-relaxed font-medium">
                     {project.description}
                   </p>
                 )}
@@ -202,12 +209,12 @@ export function PortfolioView() {
         <motion.button 
           layout
           onClick={() => setShowAddModal(true)}
-          className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center p-8 text-slate-400 dark:text-slate-600 hover:border-accent hover:text-accent dark:hover:border-accent dark:hover:text-accent transition-all group min-h-[300px]"
+          className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] flex flex-col items-center justify-center p-12 text-slate-400 dark:text-slate-600 hover:border-accent hover:text-accent dark:hover:border-accent dark:hover:text-accent transition-all group min-h-[400px] bg-slate-50/50 dark:bg-slate-900/50"
         >
-          <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4 group-hover:bg-accent/10 group-hover:scale-110 transition-all">
-            <Plus size={32} />
+          <div className="w-20 h-20 rounded-3xl bg-white dark:bg-slate-800 flex items-center justify-center mb-6 shadow-sm group-hover:bg-accent/10 group-hover:scale-110 group-hover:rotate-90 transition-all duration-500">
+            <Plus size={40} />
           </div>
-          <p className="text-sm font-bold uppercase tracking-widest">Ajouter un projet</p>
+          <p className="text-xs font-black uppercase tracking-[0.2em]">Ajouter un projet</p>
         </motion.button>
       </div>
 

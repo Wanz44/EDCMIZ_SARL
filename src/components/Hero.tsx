@@ -37,95 +37,106 @@ export default function Hero() {
   }
 
   return (
-    <section id="home" className="relative h-screen flex items-center overflow-hidden bg-petrol-dark">
+    <section id="home" className="relative min-h-screen flex items-center overflow-hidden bg-petrol-dark pt-20">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img
+        <motion.img
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
           src={content.imageUrl}
           alt="EDCMIZ Background"
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover opacity-40"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-petrol-dark via-petrol-dark/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-petrol-dark/80 via-transparent to-petrol-dark" />
+        <div className="absolute inset-0 bg-gradient-to-r from-petrol-dark via-petrol-dark/40 to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          <div className="max-w-3xl lg:w-2/3">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
+        <div className="flex flex-col lg:flex-row items-center gap-16">
+          <div className="lg:w-3/4">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
             >
-              <h2 className="text-accent font-bold uppercase tracking-[0.3em] mb-4 text-sm sm:text-base">
-                {content.subtitle}
-              </h2>
-              <h1 className="text-5xl sm:text-7xl font-black text-white leading-tight mb-8">
+              <div className="inline-flex items-center gap-3 px-4 py-2 bg-accent/10 backdrop-blur-md border border-accent/20 rounded-full mb-8">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                </span>
+                <span className="text-accent text-[10px] font-black uppercase tracking-[0.2em]">
+                  {content.subtitle}
+                </span>
+              </div>
+
+              <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[0.9] mb-8 tracking-tighter">
                 {content.title.split('.').map((part: string, i: number) => (
                   <React.Fragment key={i}>
-                    {part}{i === 0 && content.title.includes('.') && '.'}
-                    {i === 0 && <br />}
+                    <span className={i === 0 ? "text-white" : "text-accent"}>
+                      {part}{i === 0 && content.title.includes('.') && '.'}
+                    </span>
+                    {i === 0 && <br className="hidden sm:block" />}
                   </React.Fragment>
                 ))}
               </h1>
-              <p className="text-lg sm:text-xl text-white/80 mb-10 leading-relaxed max-w-2xl">
+
+              <p className="text-lg sm:text-xl text-white/70 mb-12 leading-relaxed max-w-2xl font-medium">
                 {content.description}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+
+              <div className="flex flex-col sm:flex-row gap-6">
                 <motion.a
                   href={content.ctaLink || "https://wa.me/243829002360"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  initial={{ scale: 1 }}
-                  animate={{ 
-                    scale: [1, 1.03, 1],
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="bg-accent text-petrol-dark px-10 py-5 rounded-sm font-extrabold text-xl hover:bg-white hover:scale-105 transition-all flex items-center justify-center group shadow-[0_0_20px_rgba(212,161,62,0.4)]"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-accent text-petrol-dark px-12 py-6 rounded-sm font-black text-xl hover:bg-white transition-all flex items-center justify-center group shadow-2xl shadow-accent/20"
                 >
                   {content.ctaText}
                   <ArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" size={24} />
                 </motion.a>
                 <a
                   href="#services"
-                  className="border-2 border-white/30 text-white px-10 py-5 rounded-sm font-bold text-lg hover:bg-white hover:text-petrol-dark transition-all text-center backdrop-blur-sm"
+                  className="group relative px-12 py-6 rounded-sm font-bold text-lg text-white transition-all text-center flex items-center justify-center overflow-hidden"
                 >
-                  Nos Services
+                  <span className="absolute inset-0 border-2 border-white/20 group-hover:border-white/50 transition-colors" />
+                  <span className="relative z-10">Nos Services</span>
+                  <motion.div 
+                    className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                  />
                 </a>
               </div>
             </motion.div>
           </div>
 
-          {/* 3D Floating Element */}
-          <div className="hidden lg:block lg:w-1/3 relative">
+          {/* Modern Floating Stats Card */}
+          <div className="hidden lg:block lg:w-1/4">
             <motion.div
-              initial={{ opacity: 0, rotateY: 45, translateZ: -100 }}
-              animate={{ 
-                opacity: 1, 
-                rotateY: 0, 
-                translateZ: 0,
-                y: [0, -20, 0]
-              }}
-              transition={{ 
-                duration: 4,
-                y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-              }}
-              className="relative z-10"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 0.4 }}
+              className="relative"
             >
-              <div className="w-64 h-64 bg-accent/20 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center p-8 transform rotate-12 shadow-2xl">
-                <div className="text-center">
-                  <p className="text-white text-4xl font-black mb-2">6+</p>
-                  <p className="text-accent text-xs font-bold uppercase tracking-widest">Années d'Expérience</p>
-                </div>
-              </div>
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center transform -rotate-12">
-                <div className="text-center">
-                  <p className="text-white text-xl font-bold">100%</p>
-                  <p className="text-white/60 text-[8px] font-bold uppercase tracking-widest">Qualité</p>
+              <div className="absolute -inset-4 bg-accent/30 blur-3xl rounded-full opacity-20 animate-pulse" />
+              <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-700">
+                <div className="space-y-8">
+                  <div>
+                    <p className="text-accent text-5xl font-black leading-none">6+</p>
+                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-2">Années d'Expérience</p>
+                  </div>
+                  <div className="h-px bg-white/10 w-full" />
+                  <div>
+                    <p className="text-white text-4xl font-black leading-none">100%</p>
+                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-2">Satisfaction Client</p>
+                  </div>
+                  <div className="h-px bg-white/10 w-full" />
+                  <div>
+                    <p className="text-white text-4xl font-black leading-none">50+</p>
+                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-2">Projets Réalisés</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -133,9 +144,16 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Decorative Diamond Shape */}
-      <div className="absolute right-[-10%] bottom-[-10%] w-[500px] h-[500px] bg-accent/10 diamond-clip hidden lg:block" />
-      <div className="absolute right-[5%] top-[15%] w-[300px] h-[300px] bg-white/5 diamond-clip hidden lg:block animate-pulse" />
+      {/* Modern Scroll Indicator */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      >
+        <span className="text-white/30 text-[10px] font-bold uppercase tracking-[0.3em]">Découvrir</span>
+        <div className="w-px h-12 bg-gradient-to-b from-accent to-transparent" />
+      </motion.div>
     </section>
   );
 }
