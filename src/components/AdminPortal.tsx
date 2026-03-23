@@ -35,6 +35,7 @@ import { ServicesView } from './admin/ServicesView';
 import { EquipmentView } from './admin/EquipmentView';
 import { CMSView } from './admin/CMSView';
 import { SettingsView } from './admin/SettingsView';
+import { UsersView } from './admin/UsersView';
 
 function DockIcon({ mouseX, onClick, isActive, label, theme, icon: Icon, isStart = false, isLogout = false }: any) {
   const ref = useRef<HTMLDivElement>(null);
@@ -96,7 +97,7 @@ function DockIcon({ mouseX, onClick, isActive, label, theme, icon: Icon, isStart
   );
 }
 
-type Tab = 'dashboard' | 'portfolio' | 'services' | 'equipment' | 'crm' | 'emails' | 'cms' | 'settings';
+type Tab = 'dashboard' | 'portfolio' | 'services' | 'equipment' | 'crm' | 'emails' | 'cms' | 'settings' | 'users';
 
 interface AdminPortalProps {
   onClose: () => void;
@@ -105,6 +106,7 @@ interface AdminPortalProps {
 export default function AdminPortal({ onClose }: AdminPortalProps) {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [userRole, setUserRole] = useState<'admin' | 'editor' | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -128,8 +130,30 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
   }, [theme]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        try {
+          const { getDoc, doc } = await import('firebase/firestore');
+          const { db } = await import('../lib/firebase');
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            setUserRole(userDoc.data().role);
+          } else {
+            // Default admin if email matches the main one
+            if (user.email === "adonailutonadio70@gmail.com") {
+              setUserRole('admin');
+            } else {
+              setUserRole('editor');
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          setUserRole('editor');
+        }
+      } else {
+        setUserRole(null);
+      }
       setIsAuthLoading(false);
     });
     return () => unsubscribe();
@@ -236,6 +260,7 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
     { id: 'equipment', label: 'Équipements', icon: Hammer },
     { id: 'crm', label: 'Prospects (CRM)', icon: Users },
     { id: 'emails', label: 'Emails & Messagerie', icon: Mail },
+    ...(userRole === 'admin' ? [{ id: 'users', label: 'Utilisateurs', icon: Users }] : []),
     { id: 'cms', label: 'Contenu Vitrine', icon: ImageIcon },
     { id: 'settings', label: 'Paramètres & SEO', icon: Settings },
   ];
@@ -258,6 +283,8 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
         return <CMSView />;
       case 'settings':
         return <SettingsView />;
+      case 'users':
+        return <UsersView />;
       default:
         return null;
     }
@@ -304,7 +331,9 @@ export default function AdminPortal({ onClose }: AdminPortalProps) {
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <p className="text-xs font-bold">{user.email?.split('@')[0]}</p>
-              <p className="text-[9px] text-accent uppercase font-bold tracking-widest">Admin</p>
+              <p className="text-[9px] text-accent uppercase font-bold tracking-widest">
+                {userRole === 'admin' ? 'Administrateur' : 'Éditeur'}
+              </p>
             </div>
             <button 
               onClick={handleLogout}

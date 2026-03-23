@@ -35,6 +35,7 @@ export function EmailView() {
   const [sentEmails, setSentEmails] = useState<any[]>([]);
   const [gmailMessages, setGmailMessages] = useState<any[]>([]);
   const [isGmailConnected, setIsGmailConnected] = useState<boolean | null>(null);
+  const [gmailError, setGmailError] = useState<string | null>(null);
   const [isLoadingGmail, setIsLoadingGmail] = useState(false);
   const [view, setView] = useState<'inbox' | 'gmail' | 'sent' | 'compose'>('gmail');
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
@@ -49,7 +50,19 @@ export function EmailView() {
 
   const fetchGmailMessages = useCallback(async () => {
     setIsLoadingGmail(true);
+    setGmailError(null);
     try {
+      // First check status
+      const statusRes = await fetch('/api/auth/google/status');
+      const statusData = await statusRes.json();
+      
+      if (!statusData.connected) {
+        setIsGmailConnected(false);
+        if (statusData.error) setGmailError(statusData.error);
+        setIsLoadingGmail(false);
+        return;
+      }
+
       const response = await fetch('/api/gmail/messages');
       if (response.status === 401) {
         setIsGmailConnected(false);
@@ -59,9 +72,10 @@ export function EmailView() {
       const data = await response.json();
       setGmailMessages(data);
       setIsGmailConnected(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching Gmail:', error);
       setIsGmailConnected(false);
+      setGmailError(error.message);
     } finally {
       setIsLoadingGmail(false);
     }
@@ -82,12 +96,20 @@ export function EmailView() {
   }, [fetchGmailMessages]);
 
   const handleConnectGmail = async () => {
+    setGmailError(null);
     try {
       const response = await fetch('/api/auth/google/url');
-      const { url } = await response.json();
-      window.open(url, 'gmail_oauth', 'width=600,height=700');
-    } catch (error) {
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setGmailError(data.error || 'Erreur lors de la récupération de l\'URL d\'authentification');
+        return;
+      }
+
+      window.open(data.url, 'gmail_oauth', 'width=600,height=700');
+    } catch (error: any) {
       console.error('Error getting auth URL:', error);
+      setGmailError('Impossible de contacter le serveur d\'authentification.');
     }
   };
 
@@ -373,9 +395,17 @@ export function EmailView() {
                   </div>
                   <div className="max-w-md">
                     <h3 className="text-xl font-black text-petrol-dark dark:text-white mb-2">Connectez votre Gmail</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                       Gérez les emails de <span className="font-bold text-accent">edcmiz2@gmail.com</span> directement depuis votre portail admin.
                     </p>
+                    
+                    {gmailError && (
+                      <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500 text-xs font-bold">
+                        <AlertCircle size={16} />
+                        {gmailError}
+                      </div>
+                    )}
+
                     <button 
                       onClick={handleConnectGmail}
                       className="px-8 py-4 bg-petrol-dark dark:bg-accent text-white dark:text-petrol-dark rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center gap-3 mx-auto"
@@ -383,6 +413,17 @@ export function EmailView() {
                       <ExternalLink size={18} />
                       Se connecter avec Google
                     </button>
+                    
+                    <div className="mt-8 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-[10px] text-slate-400 text-left space-y-2">
+                      <p className="font-bold uppercase tracking-widest text-slate-500 mb-1">Instructions de configuration :</p>
+                      <p>1. Allez sur la console Google Cloud.</p>
+                      <p>2. Activez l'API Gmail.</p>
+                      <p>3. Créez des identifiants OAuth 2.0 (ID Client et Code Secret).</p>
+                      <p>4. Ajoutez l'URI de redirection suivante :</p>
+                      <code className="block p-2 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 break-all select-all">
+                        {window.location.origin}/auth/google/callback
+                      </code>
+                    </div>
                   </div>
                 </div>
               ) : (

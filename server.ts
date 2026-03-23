@@ -21,6 +21,15 @@ const PORT = 3000;
 app.use(express.json());
 app.use(cookieParser());
 
+// Check for required environment variables
+const checkEnvVars = () => {
+  const missing = [];
+  if (!process.env.GOOGLE_CLIENT_ID) missing.push('GOOGLE_CLIENT_ID');
+  if (!process.env.GOOGLE_CLIENT_SECRET) missing.push('GOOGLE_CLIENT_SECRET');
+  if (!process.env.APP_URL) missing.push('APP_URL');
+  return missing;
+};
+
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -34,7 +43,29 @@ const GMAIL_SCOPES = [
 ];
 
 // Gmail OAuth Routes
+app.get('/api/auth/google/status', async (req, res) => {
+  try {
+    const missing = checkEnvVars();
+    if (missing.length > 0) {
+      return res.json({ 
+        connected: false, 
+        error: `Variables d'environnement manquantes: ${missing.join(', ')}` 
+      });
+    }
+
+    const doc = await db.collection('config').doc('gmail_tokens').get();
+    res.json({ connected: doc.exists });
+  } catch (error: any) {
+    res.status(500).json({ connected: false, error: error.message });
+  }
+});
+
 app.get('/api/auth/google/url', (req, res) => {
+  const missing = checkEnvVars();
+  if (missing.length > 0) {
+    return res.status(400).json({ error: `Veuillez configurer les variables: ${missing.join(', ')}` });
+  }
+
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: GMAIL_SCOPES,
@@ -74,6 +105,8 @@ app.get('/auth/google/callback', async (req, res) => {
 });
 
 // Gmail API Proxy Routes
+let isTokenListenerSet = false;
+
 async function getGmailClient() {
   const doc = await db.collection('config').doc('gmail_tokens').get();
   if (!doc.exists) {
@@ -82,19 +115,28 @@ async function getGmailClient() {
   const tokens = doc.data();
   oauth2Client.setCredentials(tokens!);
   
-  // Handle token refresh
-  oauth2Client.on('tokens', (newTokens) => {
-    if (newTokens.refresh_token) {
-      db.collection('config').doc('gmail_tokens').update(newTokens as any);
-    } else {
-      db.collection('config').doc('gmail_tokens').update({
-        access_token: newTokens.access_token,
-        expiry_date: newTokens.expiry_date,
-        token_type: newTokens.token_type,
-        scope: newTokens.scope
-      } as any);
-    }
-  });
+  // Handle token refresh - set up listener only once
+  if (!isTokenListenerSet) {
+    oauth2Client.on('tokens', async (newTokens) => {
+      try {
+        const tokenDoc = db.collection('config').doc('gmail_tokens');
+        const currentDoc = await tokenDoc.get();
+        const currentTokens = currentDoc.data() || {};
+        
+        // Merge new tokens with existing ones to preserve refresh_token
+        const updatedTokens = {
+          ...currentTokens,
+          ...newTokens
+        };
+        
+        await tokenDoc.set(updatedTokens);
+        console.log('Gmail tokens refreshed and saved to Firestore');
+      } catch (err) {
+        console.error('Error saving refreshed tokens:', err);
+      }
+    });
+    isTokenListenerSet = true;
+  }
 
   return google.gmail({ version: 'v1', auth: oauth2Client });
 }
