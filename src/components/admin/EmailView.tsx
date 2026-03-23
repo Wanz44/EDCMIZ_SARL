@@ -98,6 +98,12 @@ export function EmailView() {
   const handleConnectGmail = async () => {
     setGmailError(null);
     try {
+      // Check if server is up
+      const healthRes = await fetch('/api/health');
+      if (!healthRes.ok) {
+        throw new Error('Le serveur backend ne répond pas. Veuillez patienter quelques secondes et réessayer.');
+      }
+
       const response = await fetch('/api/auth/google/url');
       const data = await response.json();
       
@@ -109,7 +115,7 @@ export function EmailView() {
       window.open(data.url, 'gmail_oauth', 'width=600,height=700');
     } catch (error: any) {
       console.error('Error getting auth URL:', error);
-      setGmailError('Impossible de contacter le serveur d\'authentification.');
+      setGmailError(error.message || 'Impossible de contacter le serveur d\'authentification. Le serveur est peut-être en train de redémarrer.');
     }
   };
 

@@ -1,25 +1,49 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
+import fs from 'fs';
 import { google } from 'googleapis';
 import cookieParser from 'cookie-parser';
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, getApp, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import firebaseConfig from './firebase-applet-config.json' assert { type: 'json' };
 
-// Initialize Firebase Admin
-// Note: In this environment, we might not have a service account key, 
-// so we'll try to initialize with project ID.
-const adminApp = initializeApp({
-  projectId: firebaseConfig.projectId,
-});
-const db = getFirestore(adminApp);
+// Load Firebase Config safely
+let firebaseConfig: any = {};
+try {
+  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  }
+} catch (err) {
+  console.error('Error loading firebase-applet-config.json:', err);
+}
+
+// Initialize Firebase Admin safely
+let adminApp;
+try {
+  if (!getApps().length) {
+    adminApp = initializeApp({
+      projectId: firebaseConfig.projectId,
+    });
+  } else {
+    adminApp = getApp();
+  }
+} catch (err) {
+  console.error('Firebase Admin initialization error:', err);
+}
+
+const db = getFirestore(adminApp as any);
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Check for required environment variables
 const checkEnvVars = () => {
