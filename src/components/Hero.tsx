@@ -6,20 +6,25 @@ import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function Hero() {
   const [content, setContent] = useState<any>({
-    title: "L'Excellence dans la Construction. Partout en RDC.",
-    subtitle: "EDCMIZ SARL - BTP & GÉNIE CIVIL",
-    description: "Spécialiste en construction générale, adduction d'eau et solutions d'ingénierie moderne. Nous bâtissons l'avenir de la République Démocratique du Congo avec rigueur et expertise.",
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80",
-    ctaText: "Démarrer un Projet",
-    ctaLink: "https://wa.me/243829002360"
+    hero: {
+      title: "L'Excellence dans la Construction. Partout en RDC.",
+      subtitle: "EDCMIZ SARL - BTP & GÉNIE CIVIL",
+      description: "Spécialiste en construction générale, adduction d'eau et solutions d'ingénierie moderne. Nous bâtissons l'avenir de la République Démocratique du Congo avec rigueur et expertise.",
+      imageUrl: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80",
+      ctaText: "Démarrer un Projet",
+      ctaLink: "https://wa.me/243829002360"
+    },
+    about: {
+      experienceYears: "6+"
+    }
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const path = 'content/site';
     const unsubscribe = onSnapshot(doc(db, 'content', 'site'), (doc) => {
-      if (doc.exists() && doc.data().hero) {
-        setContent(doc.data().hero);
+      if (doc.exists()) {
+        setContent(doc.data());
       }
       setLoading(false);
     }, (error) => {
@@ -36,6 +41,9 @@ export default function Hero() {
     );
   }
 
+  const heroContent = content.hero || {};
+  const aboutContent = content.about || {};
+
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden bg-petrol-dark pt-20">
       {/* Background Image with Overlay */}
@@ -44,7 +52,7 @@ export default function Hero() {
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
-          src={content.imageUrl}
+          src={heroContent.imageUrl}
           alt="EDCMIZ Background"
           className="w-full h-full object-cover opacity-40"
           referrerPolicy="no-referrer"
@@ -67,15 +75,15 @@ export default function Hero() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
                 </span>
                 <span className="text-accent text-[10px] font-black uppercase tracking-[0.2em]">
-                  {content.subtitle}
+                  {heroContent.subtitle}
                 </span>
               </div>
 
               <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[0.9] mb-8 tracking-tighter">
-                {content.title.split('.').map((part: string, i: number) => (
+                {heroContent.title?.split('.').map((part: string, i: number) => (
                   <React.Fragment key={i}>
                     <span className={i === 0 ? "text-white" : "text-accent"}>
-                      {part}{i === 0 && content.title.includes('.') && '.'}
+                      {part}{i === 0 && heroContent.title.includes('.') && '.'}
                     </span>
                     {i === 0 && <br className="hidden sm:block" />}
                   </React.Fragment>
@@ -83,19 +91,19 @@ export default function Hero() {
               </h1>
 
               <p className="text-lg sm:text-xl text-white/70 mb-12 leading-relaxed max-w-2xl font-medium">
-                {content.description}
+                {heroContent.description}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-6">
                 <motion.a
-                  href={content.ctaLink || "https://wa.me/243829002360"}
+                  href={heroContent.ctaLink || "https://wa.me/243829002360"}
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-accent text-petrol-dark px-12 py-6 rounded-sm font-black text-xl hover:bg-white transition-all flex items-center justify-center group shadow-2xl shadow-accent/20"
                 >
-                  {content.ctaText}
+                  {heroContent.ctaText}
                   <ArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" size={24} />
                 </motion.a>
                 <a
@@ -124,7 +132,7 @@ export default function Hero() {
               <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-700">
                 <div className="space-y-8">
                   <div>
-                    <p className="text-accent text-5xl font-black leading-none">6+</p>
+                    <p className="text-accent text-5xl font-black leading-none">{aboutContent.experienceYears || '6+'}</p>
                     <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-2">Années d'Expérience</p>
                   </div>
                   <div className="h-px bg-white/10 w-full" />

@@ -4,13 +4,6 @@ import { Shield, Zap, Users, Target, Loader2 } from 'lucide-react';
 import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
-const stats = [
-  { label: 'Projets Réalisés', value: '50+' },
-  { label: 'D\'Expérience', value: '6+' },
-  { label: 'Experts Qualifiés', value: 'Plusieurs' },
-  { label: 'Clients Satisfaits', value: '100%' },
-];
-
 export default function About() {
   const [content, setContent] = useState<any>({
     title: "Bâtir avec Rigueur, Innover avec Passion",
@@ -40,6 +33,13 @@ export default function About() {
       </section>
     );
   }
+
+  const stats = [
+    { label: 'Projets Réalisés', value: '50+' },
+    { label: 'D\'Expérience', value: content.experienceYears || '6+' },
+    { label: 'Experts Qualifiés', value: 'Plusieurs' },
+    { label: 'Clients Satisfaits', value: '100%' },
+  ];
 
   return (
     <section id="about" className="py-32 bg-slate-50 overflow-hidden relative">
